@@ -1,0 +1,8 @@
+(library
+ ((name shexp_spawn)
+  (public_name shexp.spawn)
+  (wrapped false)
+  (c_names (spawn_stubs))
+  ;; No deps outside of the compiler distribution!
+  (libraries (unix))
+  (preprocess ((no_preprocessing All)))))

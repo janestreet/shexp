@@ -1,0 +1,3 @@
+(library
+ ((name shexp_spawn_bench)
+  (libraries (core shexp_spawn))))

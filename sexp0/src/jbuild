@@ -1,0 +1,7 @@
+;; Code shared between shexp and sexplib
+(library
+ ((name sexp0)
+  (public_name shexp.sexp0)
+  ;; No deps outside of the compiler distribution!
+  (libraries ())
+  (preprocess ((no_preprocessing All)))))
