@@ -1,0 +1,6 @@
+(library
+ ((name shexp_posixat_test)
+  (libraries (shexp_posixat
+              shexp_bigstring_io
+              core
+              expect_test_helpers_kernel))))

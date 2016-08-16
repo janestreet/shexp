@@ -1,4 +1,59 @@
 
+package "bigstring" (
+  version = "$(pkg_version)"
+  description = ""
+  requires = "bigarray"
+  archive(byte  ) = "shexp_bigstring.cma"
+  archive(native) = "shexp_bigstring.cmxa"
+  plugin(byte  ) = "shexp_bigstring.cma"
+  plugin(native) = "shexp_bigstring.cmxs"
+  exists_if = "shexp_bigstring.cma"
+)
+
+package "bigstring-io" (
+  version = "$(pkg_version)"
+  description = ""
+  requires = "shexp.bigstring"
+  archive(byte  ) = "shexp_bigstring_io.cma"
+  archive(native) = "shexp_bigstring_io.cmxa"
+  plugin(byte  ) = "shexp_bigstring_io.cma"
+  plugin(native) = "shexp_bigstring_io.cmxs"
+  exists_if = "shexp_bigstring_io.cma"
+)
+
+package "posixat" (
+  version = "$(pkg_version)"
+  description = ""
+  requires = "shexp.bigstring-io shexp.sexp"
+  archive(byte  ) = "shexp_posixat.cma"
+  archive(native) = "shexp_posixat.cmxa"
+  plugin(byte  ) = "shexp_posixat.cma"
+  plugin(native) = "shexp_posixat.cmxs"
+  exists_if = "shexp_posixat.cma"
+)
+
+package "process" (
+  version = "$(pkg_version)"
+  description = ""
+  requires = "shexp.bigstring shexp.bigstring-io shexp.posixat shexp.sexp shexp.spawn threads unix"
+  archive(byte  ) = "shexp_process.cma"
+  archive(native) = "shexp_process.cmxa"
+  plugin(byte  ) = "shexp_process.cma"
+  plugin(native) = "shexp_process.cmxs"
+  exists_if = "shexp_process.cma"
+)
+
+package "sexp" (
+  version = "$(pkg_version)"
+  description = ""
+  requires = "shexp.sexp0"
+  archive(byte  ) = "shexp_sexp.cma"
+  archive(native) = "shexp_sexp.cmxa"
+  plugin(byte  ) = "shexp_sexp.cma"
+  plugin(native) = "shexp_sexp.cmxs"
+  exists_if = "shexp_sexp.cma"
+)
+
 package "sexp0" (
   version = "$(pkg_version)"
   description = ""

@@ -3,5 +3,11 @@
 # This prevents the implicit addition of -ppx options by ocamlfind
 <**/*>: predicate(custom_ppx)
 <sexp0/src/*.ml>: for-pack(Sexp0)
+<bigstring-lib/src/*.ml>: for-pack(Shexp_bigstring)
+<bigstring-io-lib/src/*.ml>: for-pack(Shexp_bigstring_io)
+<posixat-lib/src/*.ml>: for-pack(Shexp_posixat)
+<process-lib/src/*.ml>: for-pack(Shexp_process)
+<sexp-lib/src/*.ml>: for-pack(Shexp_sexp)
+<sexp-lib/src/*>: ugly_hack_to_workaround_ocamlbuild_nightmare
 # OASIS_START
 # OASIS_STOP

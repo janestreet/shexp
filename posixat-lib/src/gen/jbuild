@@ -1,0 +1,4 @@
+(executables
+ ((names (gen))
+  (libraries ())
+  (preprocess ((no_preprocessing All)))))

@@ -2,11 +2,107 @@
 
 Shexp is composed of two parts: a library providing a process monad
 for shell scripting in OCaml as well as a simple s-expression based
-shell interpreter. Shexp works on both Unix and Windows.
+shell interpreter. Both provides good debugging support.
 
-** Libraries
+Shexp works on both Unix and Windows and has no dependencies outside
+of the compiler distributions.
 
-Shexp defines a few libraries that can be used independently.
+** The Shexp_process library
+
+The Shexp_process library exposes a single =Process= module allowing
+one to construct complex pipelines such as pipes and other
+redirections. It is intended to replace shell scripts as well as
+provide a more complete alternative to =Async.Std.Process= like
+modules.
+
+On Unix, Shexp_process uses the specific *at system calls (such as
+=openat=) to reliably maintain several working directories inside the
+same system process as well as =vfork= to avoid performance problems
+with large processes.
+
+*** Usage
+
+One create a value of type ='a Process.t= which represent a process
+pipeline. Using the combinators of the process module, one can modify
+the execution environemt (current working directory, environment
+variables, ...) as well as construct complex redirections.
+
+To effectively execute the pipeline and get a result, one has to call
+=Process.eval=.
+
+Essentially you get the same primitives as what you would get from a
+shell, except that everything is typed:
+
+#+begin_src ocaml
+(** Run an external program *)
+val run : string -> string list -> unit t
+
+(** Equivalent of a shell pipe *)
+val pipe : unit t -> 'a t -> 'a t
+
+(** Same thing, but you get the values from both sides of the pipe *)
+val pipe_both : 'a t -> 'b t -> ('a * 'b) t
+
+(** Read all of the process' standard input  *)
+val read_all : string t
+
+(** [chdir dir k] exexutes [k] with the current directory set to [dir] *)
+val chdir : stirng -> 'a t -> 'a t
+#+end_src
+
+For instance, to run an external command in a given directory and
+capture its standard output, where =|-= is infix operator for =pipe=:
+
+#+begin_src ocaml
+let f ~dir prog args = eval (chdir dir (run prog args |- real_all))
+#+end_src
+
+*** Debugging
+
+Shexp_process allows one to plug a debugger in the evaluator. A
+debugger is essentially a set of hooks called at the approrioate
+places by Shexp_process. Shexp_process itself provides two
+non-interactive debuggers: a logger and a tracer.
+
+The logger is intended for printing command synchrously as they are a
+run, a bit like =set -x= in bash.
+
+The tracer provides a full trace of execution. The trace is presented
+as a tree, so you can see clearly what happens on both sides of a
+fork.
+
+For instance the following process:
+
+#+begin_src ocaml
+echo "Hello, world!" |- run "blah" []
+#+end src_ocaml
+
+would produce the following trace:
+
+#+begin_src scheme
+((create-pipe)
+ (-> (4 5))
+ (fork
+   (
+    (do
+      (set-ios (stdout) 5)
+      (echo "Hello, world!"))
+    (close-fd 36)
+   )
+   (
+    (do
+      (set-ios (stdin) 4)
+      (run blah ())
+      (raised (Failure "blah: command not found")))
+    (close-fd 35)
+   )
+ )
+)
+#+end_src scheme
+
+** Other libraries
+
+Shexp defines a few other libraries that can be used independently.
 
 *** Shexp_spawn
 
@@ -24,3 +120,8 @@ faster than fork. There is a benchmark comparing =Shexp_spawn.spawn=
 to =Unix.create_process= in =spawn-lib/bench=. If you don't trust
 =vfork=, you can set the environment variable =SHEXP_USE_FORK= to make
 Shexp_spawn use =fork= instead.
+
+*** Shexp_posixat
+
+This library simply binds the various *at posix functions. None of
+these function is implemented on Windows.

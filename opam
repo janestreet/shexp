@@ -13,6 +13,7 @@ depends: [
   "ocamlbuild"     {build}
   "oasis"          {build & >= "0.4"}
   "ocamlfind"      {build & >= "1.3.2"}
+  "base-threads"
   "js-build-tools" {build}
 ]
 available: [ ocaml-version >= "4.03.0" ]

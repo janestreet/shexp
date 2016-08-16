@@ -1,0 +1,13 @@
+(library
+ ((name shexp_process)
+  (public_name shexp.process)
+  (c_names (pipe_stubs))
+  ;; No deps outside of the compiler distribution!
+  (libraries (unix
+              threads
+              shexp_sexp
+              shexp_spawn
+              shexp_bigstring
+              shexp_bigstring_io
+              shexp_posixat))
+  (preprocess ((no_preprocessing All)))))

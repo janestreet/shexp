@@ -2,7 +2,7 @@ OASISFormat:           0.4
 OCamlVersion:          >= 4.03.0
 FindlibVersion:        >= 1.3.2
 Name:                  shexp
-Version:               114.05+91
+Version:               114.06+12
 Synopsis:              Process library and s-expression based shell
 Authors:               Jane Street Group, LLC <opensource@janestreet.com>
 Copyrights:            (C) 2016 Jane Street Group LLC <opensource@janestreet.com>
@@ -27,6 +27,64 @@ Library sexp0
   Path:    sexp0/src
   Pack:    true
   Modules: Sexp
+
+Library shexp_bigstring
+  Path:         bigstring-lib/src
+  Pack:         true
+  Modules:      Bigstring,
+                Std
+  BuildDepends: bigarray
+  CSources:     bigstring_stubs.c
+
+Library shexp_bigstring_io
+  Path:         bigstring-io-lib/src
+  Pack:         true
+  Modules:      Bigstring,
+                Std
+  BuildDepends: shexp_bigstring
+  CSources:     bigstring_io_stubs.c
+
+Library shexp_posixat
+  Path:         posixat-lib/src
+  Pack:         true
+  Modules:      Posixat,
+                Posixat_generated,
+                Std,
+                Types
+  BuildDepends: shexp_bigstring_io,
+                shexp_sexp
+  CSources:     common.h,
+                posixat_generated_stubs.c,
+                posixat_stubs.c
+
+Library shexp_process
+  Path:         process-lib/src
+  Pack:         true
+  Modules:      Debugger_intf,
+                Debuggers,
+                Env,
+                Exit_status,
+                Import,
+                Job,
+                Prim,
+                Process,
+                Std,
+                Std_io
+  BuildDepends: shexp_bigstring,
+                shexp_bigstring_io,
+                shexp_posixat,
+                shexp_sexp,
+                shexp_spawn,
+                threads,
+                unix
+  CSources:     pipe_stubs.c
+
+Library shexp_sexp
+  Path:         sexp-lib/src
+  Pack:         true
+  Modules:      Sexp,
+                Std
+  BuildDepends: sexp0
 
 Library shexp_spawn
   Path:         spawn-lib/src
