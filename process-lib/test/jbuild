@@ -1,5 +1,7 @@
 (library
  ((name shexp_process_test)
+  ;; If you add async here, be sure to check the hack to close fds >=
+  ;; 3 in import.ml
   (libraries (shexp_process
               core
               expect_test_helpers_kernel))))

@@ -35,31 +35,31 @@ let%expect_test _ =
      (do
        (chdir <temp-dir>)
        (open-file (perm 0o666) (flags (O_WRONLY O_CREAT O_TRUNC)) blah)
-       (-> 36)
-       (do (set-ios (stdout) 36) (echo "Bonjour les amis"))
-       (close-fd 36)
+       (-> 9)
+       (do (set-ios (stdout) 9) (echo "Bonjour les amis"))
+       (close-fd 9)
        (run cat (blah))
        "Bonjour les amis\n"
        (-> (Exited 0))
        (create-pipe)
-       (-> (36 37))
+       (-> (9 10))
        (fork
          ((do
-            (set-ios (stdout) 37)
+            (set-ios (stdout) 10)
             (create-pipe)
-            (-> (40 41))
+            (-> (13 14))
             (fork
-              ((do (set-ios (stdout) 41) (run cat (blah)) (-> (Exited 0)))
-               (close-fd 41))
-              ((do (set-ios (stdin) 40) (run sed (s/o/a/g)) (-> (Exited 0)))
-               (close-fd 40))))
-          (close-fd 37))
+              ((do (set-ios (stdout) 14) (run cat (blah)) (-> (Exited 0)))
+               (close-fd 14))
+              ((do (set-ios (stdin) 13) (run sed (s/o/a/g)) (-> (Exited 0)))
+               (close-fd 13))))
+          (close-fd 10))
          ((do
-            (set-ios (stdin) 36)
+            (set-ios (stdin) 9)
             (run sed ("s/ /\\n/g"))
             "Banjaur\nles\namis\n"
             (-> (Exited 0)))
-          (close-fd 36)))
+          (close-fd 9)))
        (echo "C'est finit!")
        "C'est finit!\n")
      (chdir   <temp-dir>)
@@ -106,20 +106,20 @@ let%expect_test "rename current directory" =
        (do
          (chdir <temp-dir>)
          (create-pipe)
-         (-> (37 38))
+         (-> (10 11))
          (fork
            ((do
-              (set-ios (stdout) 38)
+              (set-ios (stdout) 11)
               (create-pipe)
-              (-> (41 42))
+              (-> (14 15))
               (fork
-                ((do (set-ios (stdout) 42) (run find ()) (-> (Exited 0)))
-                 (close-fd 42))
-                ((do (set-ios (stdin) 41) (run sort ()) (-> (Exited 0)))
-                 (close-fd 41))))
-            (close-fd 38))
+                ((do (set-ios (stdout) 15) (run find ()) (-> (Exited 0)))
+                 (close-fd 15))
+                ((do (set-ios (stdin) 14) (run sort ()) (-> (Exited 0)))
+                 (close-fd 14))))
+            (close-fd 11))
            ((do
-              (set-ios (stdin) 37)
+              (set-ios (stdin) 10)
               (read-line)
               (-> (.))
               (echo (n true) "- .\n")
@@ -130,13 +130,13 @@ let%expect_test "rename current directory" =
               "- ./blah\n"
               (read-line)
               (-> ()))
-            (close-fd 37))))
+            (close-fd 10))))
        (echo (n true) "\n")
        "\n"
        (open-file (perm 0o666) (flags (O_WRONLY O_CREAT O_TRUNC)) blah/foo)
-       (-> 36)
-       (do (set-ios (stdout) 36) (echo "Hello, world!"))
-       (close-fd 36)
+       (-> 9)
+       (do (set-ios (stdout) 9) (echo "Hello, world!"))
+       (close-fd 9)
        (echo     "created file blah/foo")
        "created file blah/foo\n"
        (echo (n true) "\ntmp dir contents:\n")
@@ -144,20 +144,20 @@ let%expect_test "rename current directory" =
        (do
          (chdir <temp-dir>)
          (create-pipe)
-         (-> (37 38))
+         (-> (10 11))
          (fork
            ((do
-              (set-ios (stdout) 38)
+              (set-ios (stdout) 11)
               (create-pipe)
-              (-> (41 42))
+              (-> (14 15))
               (fork
-                ((do (set-ios (stdout) 42) (run find ()) (-> (Exited 0)))
-                 (close-fd 42))
-                ((do (set-ios (stdin) 41) (run sort ()) (-> (Exited 0)))
-                 (close-fd 41))))
-            (close-fd 38))
+                ((do (set-ios (stdout) 15) (run find ()) (-> (Exited 0)))
+                 (close-fd 15))
+                ((do (set-ios (stdin) 14) (run sort ()) (-> (Exited 0)))
+                 (close-fd 14))))
+            (close-fd 11))
            ((do
-              (set-ios (stdin) 37)
+              (set-ios (stdin) 10)
               (read-line)
               (-> (.))
               (echo (n true) "- .\n")
@@ -172,7 +172,7 @@ let%expect_test "rename current directory" =
               "- ./blah/foo\n"
               (read-line)
               (-> ()))
-            (close-fd 37))))
+            (close-fd 10))))
        (echo (n true) "\n")
        "\n"
        (chdir blah)
@@ -184,20 +184,20 @@ let%expect_test "rename current directory" =
        (do
          (chdir <temp-dir>)
          (create-pipe)
-         (-> (37 38))
+         (-> (10 11))
          (fork
            ((do
-              (set-ios (stdout) 38)
+              (set-ios (stdout) 11)
               (create-pipe)
-              (-> (41 42))
+              (-> (14 15))
               (fork
-                ((do (set-ios (stdout) 42) (run find ()) (-> (Exited 0)))
-                 (close-fd 42))
-                ((do (set-ios (stdin) 41) (run sort ()) (-> (Exited 0)))
-                 (close-fd 41))))
-            (close-fd 38))
+                ((do (set-ios (stdout) 15) (run find ()) (-> (Exited 0)))
+                 (close-fd 15))
+                ((do (set-ios (stdin) 14) (run sort ()) (-> (Exited 0)))
+                 (close-fd 14))))
+            (close-fd 11))
            ((do
-              (set-ios (stdin) 37)
+              (set-ios (stdin) 10)
               (read-line)
               (-> (.))
               (echo (n true) "- .\n")
@@ -212,23 +212,23 @@ let%expect_test "rename current directory" =
               "- ./blah-new/foo\n"
               (read-line)
               (-> ()))
-            (close-fd 37))))
+            (close-fd 10))))
        (echo (n true) "\n")
        "\n"
        (create-pipe)
-       (-> (35 37))
+       (-> (8 10))
        (fork
-         ((do (set-ios (stdout) 37) (run pwd (-P)) (-> (Exited 0))) (close-fd 37))
-         ((do (set-ios (stdin) 35) (read-all) (-> "<temp-dir>/blah-new\n"))
-          (close-fd 35)))
+         ((do (set-ios (stdout) 10) (run pwd (-P)) (-> (Exited 0))) (close-fd 10))
+         ((do (set-ios (stdin) 8) (read-all) (-> "<temp-dir>/blah-new\n"))
+          (close-fd 8)))
        (echo
          (n true)
          "physical current working directory after rename: \"<tempdir>/blah-new\"\n")
        "physical current working directory after rename: \"<tempdir>/blah-new\"\n"
        (open-file (flags (O_RDONLY)) foo)
-       (-> 35)
-       (do (set-ios (stdin) 35) (read-all) (-> "Hello, world!\n"))
-       (close-fd 35)
+       (-> 8)
+       (do (set-ios (stdin) 8) (read-all) (-> "Hello, world!\n"))
+       (close-fd 8)
        (echo (n true) "file foo contains \"Hello, world!\\n\"\n")
        "file foo contains \"Hello, world!\\n\"\n")
      (chdir   <temp-dir>)

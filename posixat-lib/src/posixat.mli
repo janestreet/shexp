@@ -168,3 +168,5 @@ val readlinkat
   -> string
 
 val fdopendir : Fd.t -> Unix.dir_handle
+
+val has_mkfifoat : bool

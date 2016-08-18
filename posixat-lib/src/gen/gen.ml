@@ -34,7 +34,7 @@ module Result = struct
   type t = Unit | Fd
 end
 
-type stub = string * (string * Param.t) list * Result.t
+type stub = string * (string * Param.t) list * Result.t * bool (* available on OSX *)
 
 let stubs : stub list =
   let open Param in
@@ -46,24 +46,34 @@ let stubs : stub list =
   let newpath  = "newpath" , Path            in
   let at_flags = "flags"   , Flags "at_flag" in
   let perm     = "perm"    , Perm            in
-  [ "openat"    , [dir; path; ("flags", Flags "open_flag"); perm           ], Fd
-  ; "faccessat" , [dir; path; ("mode", Flags "access_permission"); at_flags], Unit
-  ; "fchmodat"  , [dir; path; perm;                                at_flags], Unit
-  ; "fchownat"  , [dir; path; ("uid", Int); ("gid", Int);          at_flags], Unit
-  ; "mkdirat"   , [dir; path; perm                                         ], Unit
-  ; "unlinkat"  , [dir; path; at_flags                                     ], Unit
-  ; "mkfifoat"  , [dir; path; perm                                         ], Unit
-  ; "linkat"    , [olddir; oldpath; newdir; newpath;               at_flags], Unit
-  ; "renameat"  , [olddir; oldpath; newdir; newpath                        ], Unit
-  ; "symlinkat" , [oldpath; newdir; newpath                                ], Unit
+  [ "openat"    , [dir; path; ("flags", Flags "open_flag"); perm           ], Fd   , true
+  ; "faccessat" , [dir; path; ("mode", Flags "access_permission"); at_flags], Unit , true
+  ; "fchmodat"  , [dir; path; perm;                                at_flags], Unit , true
+  ; "fchownat"  , [dir; path; ("uid", Int); ("gid", Int);          at_flags], Unit , true
+  ; "mkdirat"   , [dir; path; perm                                         ], Unit , true
+  ; "unlinkat"  , [dir; path; at_flags                                     ], Unit , true
+  ; "mkfifoat"  , [dir; path; perm                                         ], Unit , false
+  ; "linkat"    , [olddir; oldpath; newdir; newpath;               at_flags], Unit , true
+  ; "renameat"  , [olddir; oldpath; newdir; newpath                        ], Unit , true
+  ; "symlinkat" , [oldpath; newdir; newpath                                ], Unit , true
   ]
 
 let pr fmt = printf (fmt ^^ "\n")
 
-let gen_stub ((name, params, result) : stub) =
+let gen_stub ((name, params, result, on_osx) : stub) =
   let args ~prefix =
     List.map params ~f:(fun (v, _) -> prefix ^ v) |> String.concat ~sep:", "
   in
+  pr "";
+  if not on_osx then begin
+    pr "#if defined(__APPLE__)";
+    pr "";
+    pr "NA(%s)" name;
+    pr "";
+    pr "#else";
+    pr "";
+  end;
+  pr "CAMLprim value shexp_has_%s() { return Val_true; }" name;
   pr "";
   pr "CAMLprim value shexp_%s(%s)" name (args ~prefix:"value v_");
   pr "{";
@@ -105,9 +115,13 @@ let gen_stub ((name, params, result) : stub) =
     (match result with
      | Unit -> "Val_unit"
      | Fd   -> "Val_int(fd)");
-  pr "}"
+  pr "}";
+  if not on_osx then begin
+    pr "";
+    pr "#endif"
+  end
 
-let gen_external ((name, params, result) : stub) =
+let gen_external ((name, params, result, _on_osx) : stub) =
   pr "";
   pr "external %s" name;
   match params with
@@ -121,6 +135,11 @@ let gen_external ((name, params, result) : stub) =
        | Unit -> "unit"
        | Fd   -> "Fd.t");
     pr "  = \"shexp_%s\"" name
+
+let gen_has_external ((name, _, _, _) : stub) =
+  pr "";
+  pr "external has_%s : unit -> bool = \"shexp_has_%s\"" name name;
+  pr "let has_%s = has_%s ()" name name
 
 let () =
   let argv = Array.to_list Sys.argv in
@@ -136,7 +155,7 @@ let () =
     pr "";
     pr "#if defined(_WIN32)";
     pr "";
-    List.iter stubs ~f:(fun (name, _, _) ->
+    List.iter stubs ~f:(fun (name, _, _, _on_osx) ->
       pr "NA(%s);" name);
     pr "";
     pr "#else /* defined(_WIN32) */";
@@ -147,7 +166,8 @@ let () =
     pr "(* %s *)" comment;
     pr "";
     pr "open Types";
-    List.iter stubs ~f:gen_external
+    List.iter stubs ~f:gen_external;
+    List.iter stubs ~f:gen_has_external
   | _ ->
     eprintf "Usage: %s [c|ml]\n" Sys.argv.(0);
     exit 2

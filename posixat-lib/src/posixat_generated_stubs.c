@@ -17,6 +17,8 @@ NA(symlinkat);
 
 #else /* defined(_WIN32) */
 
+CAMLprim value shexp_has_openat() { return Val_true; }
+
 CAMLprim value shexp_openat(value v_dir, value v_path, value v_flags, value v_perm)
 {
   CAMLparam4(v_dir, v_path, v_flags, v_perm);
@@ -40,6 +42,8 @@ CAMLprim value shexp_openat(value v_dir, value v_path, value v_flags, value v_pe
   if (fd == -1) uerror("openat", v_path);
   CAMLreturn(Val_int(fd));
 }
+
+CAMLprim value shexp_has_faccessat() { return Val_true; }
 
 CAMLprim value shexp_faccessat(value v_dir, value v_path, value v_mode, value v_flags)
 {
@@ -65,6 +69,8 @@ CAMLprim value shexp_faccessat(value v_dir, value v_path, value v_mode, value v_
   CAMLreturn(Val_unit);
 }
 
+CAMLprim value shexp_has_fchmodat() { return Val_true; }
+
 CAMLprim value shexp_fchmodat(value v_dir, value v_path, value v_perm, value v_flags)
 {
   CAMLparam4(v_dir, v_path, v_perm, v_flags);
@@ -88,6 +94,8 @@ CAMLprim value shexp_fchmodat(value v_dir, value v_path, value v_perm, value v_f
   if (res == -1) uerror("fchmodat", v_path);
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value shexp_has_fchownat() { return Val_true; }
 
 CAMLprim value shexp_fchownat(value v_dir, value v_path, value v_uid, value v_gid, value v_flags)
 {
@@ -115,6 +123,8 @@ CAMLprim value shexp_fchownat(value v_dir, value v_path, value v_uid, value v_gi
   CAMLreturn(Val_unit);
 }
 
+CAMLprim value shexp_has_mkdirat() { return Val_true; }
+
 CAMLprim value shexp_mkdirat(value v_dir, value v_path, value v_perm)
 {
   CAMLparam3(v_dir, v_path, v_perm);
@@ -136,6 +146,8 @@ CAMLprim value shexp_mkdirat(value v_dir, value v_path, value v_perm)
   if (res == -1) uerror("mkdirat", v_path);
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value shexp_has_unlinkat() { return Val_true; }
 
 CAMLprim value shexp_unlinkat(value v_dir, value v_path, value v_flags)
 {
@@ -159,6 +171,14 @@ CAMLprim value shexp_unlinkat(value v_dir, value v_path, value v_flags)
   CAMLreturn(Val_unit);
 }
 
+#if defined(__APPLE__)
+
+NA(mkfifoat)
+
+#else
+
+CAMLprim value shexp_has_mkfifoat() { return Val_true; }
+
 CAMLprim value shexp_mkfifoat(value v_dir, value v_path, value v_perm)
 {
   CAMLparam3(v_dir, v_path, v_perm);
@@ -180,6 +200,10 @@ CAMLprim value shexp_mkfifoat(value v_dir, value v_path, value v_perm)
   if (res == -1) uerror("mkfifoat", v_path);
   CAMLreturn(Val_unit);
 }
+
+#endif
+
+CAMLprim value shexp_has_linkat() { return Val_true; }
 
 CAMLprim value shexp_linkat(value v_olddir, value v_oldpath, value v_newdir, value v_newpath, value v_flags)
 {
@@ -209,6 +233,8 @@ CAMLprim value shexp_linkat(value v_olddir, value v_oldpath, value v_newdir, val
   CAMLreturn(Val_unit);
 }
 
+CAMLprim value shexp_has_renameat() { return Val_true; }
+
 CAMLprim value shexp_renameat(value v_olddir, value v_oldpath, value v_newdir, value v_newpath)
 {
   CAMLparam4(v_olddir, v_oldpath, v_newdir, v_newpath);
@@ -234,6 +260,8 @@ CAMLprim value shexp_renameat(value v_olddir, value v_oldpath, value v_newdir, v
   if (res == -1) uerror("renameat", v_newpath);
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value shexp_has_symlinkat() { return Val_true; }
 
 CAMLprim value shexp_symlinkat(value v_oldpath, value v_newdir, value v_newpath)
 {

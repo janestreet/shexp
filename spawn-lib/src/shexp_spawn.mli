@@ -24,3 +24,8 @@ val spawn
   -> ?stderr:Unix.file_descr
   -> unit
   -> int
+
+(**/**)
+(* Create a pipe with [O_CLOEXEC] sets for both fds. On OSX, both [pipe] and [spawn] take
+   the same mutex to prevent race conditions. On other unixes, it is just [pipe2]. *)
+val safe_pipe : unit -> Unix.file_descr * Unix.file_descr

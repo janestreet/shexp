@@ -77,3 +77,21 @@ let spawn ?env ?(cwd=Working_dir.Inherit) ~prog ~argv
       spawn_unix
   in
   backend ~env ~cwd ~prog ~argv ~stdin ~stdout ~stderr ~use_vfork
+
+external safe_pipe : unit -> Unix.file_descr * Unix.file_descr = "shexp_spawn_pipe"
+
+let safe_pipe =
+  if Sys.win32 then
+    fun () ->
+      let fdr, fdw = Unix.pipe () in
+      match
+        Unix.set_close_on_exec fdr;
+        Unix.set_close_on_exec fdw
+      with
+      | () -> (fdr, fdw)
+      | exception exn ->
+        (try Unix.close fdr with _ -> ());
+        (try Unix.close fdw with _ -> ());
+        raise exn
+  else
+    safe_pipe

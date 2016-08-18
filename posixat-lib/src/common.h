@@ -13,6 +13,11 @@
   CAMLprim value shexp_##name()                 \
   {                                             \
     unix_error(ENOSYS, #name, Nothing);         \
+  }                                             \
+                                                \
+  CAMLprim value shexp_has_##name()             \
+  {                                             \
+    return Val_false;                           \
   }
 
 #if !defined(_WIN32)
@@ -22,8 +27,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
- #include <dirent.h>
+#include <dirent.h>
 #include <stdio.h>
+#include <errno.h>
 #endif
 
 extern int shexp_at_flag_table[];

@@ -721,19 +721,10 @@ let fold_chunks =
 let iter_lines f = fold_lines ~init:() ~f:(fun () line -> f line)
 let iter_chunks ~sep f = fold_chunks ~sep ~init:() ~f:(fun () line -> f line)
 
-external unix_pipe2 : unit -> Unix.file_descr * Unix.file_descr = "shexp_pipe2"
-
 let create_pipe =
   let prim =
     Prim.make "create-pipe" [] (F (Sexp.pair Posixat.Fd.sexp_of_t Posixat.Fd.sexp_of_t))
-      (fun _ ->
-         if Sys.win32 then
-           let fdr, fdw = Unix.pipe () in
-           Unix.set_close_on_exec fdr;
-           Unix.set_close_on_exec fdw;
-           (fdr, fdw)
-         else
-           unix_pipe2 ())
+      (fun _ -> Shexp_spawn.safe_pipe ())
   in
   pack0 prim
 
@@ -875,15 +866,19 @@ let rmdir =
   fun fn -> pack1 prim fn
 
 let mkfifo =
-  let prim =
-    Prim.make "mkfifo"
-      [ O ("perm", Posixat.File_perm.sexp_of_t, 0o666)
-      ; A sexp_of_string
-      ]
-      Unit
-      (fun env perm path -> Env.mkdir env path ~perm)
-  in
-  fun ?(perm=0o666) path -> pack2 prim perm path
+  if Sys.win32 || Posixat.has_mkfifoat then
+    let prim =
+      Prim.make "mkfifo"
+        [ O ("perm", Posixat.File_perm.sexp_of_t, 0o666)
+        ; A sexp_of_string
+        ]
+        Unit
+        (fun env perm path -> Env.mkfifo env path ~perm)
+    in
+    fun ?(perm=0o666) path -> pack2 prim perm path
+  else
+    fun ?(perm=0o666) path ->
+      run "/usr/bin/mkfifo" ["-m"; Printf.sprintf "0o%3o" perm; "--"; path]
 
 let link =
   let prim =

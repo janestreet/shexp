@@ -14,8 +14,9 @@ CAMLprim value shexp_bigstring_io_read(value fd, value buf, value ofs, value len
 {
   CAMLparam1(buf);
   int ret;
+  char *ptr = get_buf(buf, ofs);
   caml_enter_blocking_section();
-  ret = read(Int_val(fd), get_buf(buf, ofs), Long_val(len));
+  ret = read(Int_val(fd), ptr, Long_val(len));
   caml_leave_blocking_section();
   if (ret == -1) uerror("read", Nothing);
   CAMLreturn(Val_int(ret));
@@ -25,8 +26,9 @@ CAMLprim value shexp_bigstring_io_write(value fd, value buf, value ofs, value le
 {
   CAMLparam1(buf);
   int ret;
+  char *ptr = get_buf(buf, ofs);
   caml_enter_blocking_section();
-  ret = write(Int_val(fd), get_buf(buf, ofs), Long_val(len));
+  ret = write(Int_val(fd), ptr, Long_val(len));
   caml_leave_blocking_section();
   if (ret == -1) uerror("write", Nothing);
   CAMLreturn(Val_int(ret));

@@ -4,6 +4,26 @@ include Shexp_process.Std
 module P = Process
 include P.Infix
 
+(* Close all fds >= 3. Must be called before creating the context. *)
+let () =
+  let get_fds () =
+    Sys.readdir "/proc/self/fd"
+    |> Array.to_list
+    |> List.map ~f:int_of_string
+    |> List.sort ~cmp:Int.compare
+  in
+  List.iter (get_fds ()) ~f:(fun fd_num ->
+    if fd_num >= 3 then
+      let fd = Unix.File_descr.of_int fd_num in
+      try
+        Unix.close fd
+      with Unix.Unix_error (EBADF, _, _) ->
+        (* We get the fd for the directory itself in this list *)
+        ()
+  );
+  (* Fd 3 is the file descriptor for reading the directory *)
+  [%test_result: int list] ~expect:[0; 1; 2; 3] (get_fds ())
+
 let context = Process.Context.create ()
 
 let without_backtrace f =
@@ -69,25 +89,3 @@ let rename_current_directory =
                   printf "physical current working directory after rename: %S\n" p)
                 >> stdin_from "foo" read_all
                 >>= printf "file foo contains %S\n")))
-
-(* Make sure that we always get the same fd numbers in tests: make sure we have a block of
-   fds from 0 to 31. *)
-let () =
-  let block = Int.Set.of_list (List.range 0 32) in
-  let rec loop () =
-    let fds =
-      Sys.readdir "/proc/self/fd"
-      |> Array.map ~f:int_of_string
-      |> Int.Set.of_array
-    in
-    [%test_result: Int.Set.t] ~expect:Int.Set.empty
-      (Set.diff fds block);
-    let to_open = Set.length (Set.diff block fds) in
-    if to_open > 0 then begin
-      for _ = 1 to to_open do
-        ignore (Unix.openfile "/dev/null" ~mode:[O_RDONLY] : Unix.File_descr.t)
-      done;
-      loop ()
-    end
-  in
-  loop ()

@@ -75,7 +75,7 @@ For instance the following process:
 
 #+begin_src ocaml
 echo "Hello, world!" |- run "blah" []
-#+end src_ocaml
+#+end_src
 
 would produce the following trace:
 
@@ -98,7 +98,7 @@ would produce the following trace:
    )
  )
 )
-#+end_src scheme
+#+end_src
 
 ** Other libraries
 

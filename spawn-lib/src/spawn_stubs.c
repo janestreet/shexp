@@ -2,6 +2,7 @@
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
+#include <caml/alloc.h>
 #include <caml/unixsupport.h>
 #include <caml/signals.h>
 
@@ -16,6 +17,77 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <pthread.h>
+#include <signal.h>
+
+/* +-----------------------------------------------------------------+
+   | pipe2                                                           |
+   +-----------------------------------------------------------------+ */
+
+#if defined(__APPLE__)
+
+static int safe_pipe(int fd[2])
+{
+  int i;
+  if (pipe(fd) == -1) return -1;
+  for (i = 0; i < 2; i++) {
+    int retcode = fcntl(fd[i], F_GETFD, 0);
+    if (retcode == -1 ||
+        fcntl(fd[i], F_SETFD, retcode | FD_CLOEXEC) == -1) {
+      int error = errno;
+      close(fd[0]);
+      close(fd[1]);
+      errno = error;
+      return -1;
+    }
+  }
+  return 0;
+}
+
+static pthread_mutex_t safe_pipe_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+#define enter_safe_pipe_section() pthread_mutex_lock(&safe_pipe_mutex)
+#define leave_safe_pipe_section() pthread_mutex_unlock(&safe_pipe_mutex)
+
+CAMLprim value shexp_spawn_pipe()
+{
+  int fd[2];
+  int ret;
+  value res;
+  caml_enter_blocking_section();
+  enter_safe_pipe_section();
+  ret = safe_pipe(fd);
+  leave_safe_pipe_section();
+  caml_leave_blocking_section();
+  if (ret == -1)
+    uerror("pipe", Nothing);
+  res = caml_alloc_small(2, 0);
+  Field(res, 0) = Val_int(fd[0]);
+  Field(res, 1) = Val_int(fd[1]);
+  return res;
+}
+
+#else
+
+#define enter_safe_pipe_section()
+#define leave_safe_pipe_section()
+
+static int safe_pipe(int fd[2])
+{
+  return pipe2(fd, O_CLOEXEC);
+}
+
+CAMLprim value shexp_spawn_pipe()
+{
+  int fd[2];
+  value res;
+  if (safe_pipe(fd) == -1) uerror("pipe", Nothing);
+  res = caml_alloc_small(2, 0);
+  Field(res, 0) = Val_int(fd[0]);
+  Field(res, 1) = Val_int(fd[1]);
+  return res;
+}
+
+#endif
 
 /* +-----------------------------------------------------------------+
    | Code executed in the child                                      |
@@ -248,6 +320,16 @@ CAMLprim value shexp_spawn_unix(value v_env,
   info.env  = Is_block(v_env) ? alloc_string_vect(Field(v_env, 0)) : NULL;
 
   caml_enter_blocking_section();
+  enter_safe_pipe_section();
+
+  /* Pipe used by the child to send errors to the parent. */
+  if (safe_pipe(result_pipe) == -1) {
+    int error = errno;
+    leave_safe_pipe_section();
+    caml_leave_blocking_section();
+    free_spawn_info(&info);
+    unix_error(error, "pipe", Nothing);
+  }
 
   /* Block signals and thread cancellation. When using vfork, the
      child might share the signal handlers.
@@ -262,13 +344,6 @@ CAMLprim value shexp_spawn_unix(value v_env,
   sigfillset(&sigset);
   pthread_sigmask(SIG_SETMASK, &sigset, &saved_procmask);
 
-  /* Pipe used by the child to send errors to the parent. */
-  if (pipe2(result_pipe, O_CLOEXEC) == -1) {
-    int error = errno;
-    free_spawn_info(&info);
-    unix_error(error, "pipe2", Nothing);
-  }
-
   ret = Bool_val(v_use_vfork) ? vfork() : fork();
 
   if (ret == 0) {
@@ -277,6 +352,7 @@ CAMLprim value shexp_spawn_unix(value v_env,
   }
   failure.error = errno;
 
+  leave_safe_pipe_section();
   free_spawn_info(&info);
   close(result_pipe[1]);
 
@@ -327,6 +403,7 @@ CAMLprim value shexp_spawn_windows()
 }
 
 #else
+
 CAMLprim value shexp_spawn_unix()
 {
   unix_error(ENOSYS, "shexp_spawn_unix", Nothing);
@@ -368,6 +445,11 @@ CAMLprim value shexp_spawn_windows(value v_env,
   CloseHandle(pi.hThread);
 
   return Val_long(pi.hProcess);
+}
+
+CAMLprim value shexp_spawn_pipe()
+{
+  unix_error(ENOSYS, "shexp_spawn_pipe", Nothing);
 }
 
 #endif
