@@ -51,9 +51,9 @@ let%expect_test _ =
       let l =
         protectx (Posixat.fdopendir tmpdirfd) ~finally:Unix.closedir ~f:(fun dh ->
           let rec loop acc =
-            match Unix.readdir dh with
-            | fname -> loop (fname :: acc)
-            | exception End_of_file -> List.sort acc ~cmp:String.compare
+            match Unix.readdir_opt dh with
+            | Some fname -> loop (fname :: acc)
+            | None -> List.sort acc ~cmp:String.compare
           in
           loop [])
       in
