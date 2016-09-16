@@ -1,8 +1,0 @@
-;; Code shared between shexp and sexplib
-(library
- ((name sexp0)
-  (public_name shexp.sexp0)
-  ;; No deps outside of the compiler distribution!
-  (libraries ())
-  (js_of_ocaml ())
-  (preprocess ((no_preprocessing All)))))

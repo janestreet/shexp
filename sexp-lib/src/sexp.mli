@@ -1,6 +1,6 @@
 (** Mini S-expression library *)
 
-type t = Sexp0.Sexp.t = Atom of string | List of t list
+type t = Base0.Sexp.t = Atom of string | List of t list
 
 val to_string : t -> string
 

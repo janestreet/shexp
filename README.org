@@ -4,8 +4,7 @@ Shexp is composed of two parts: a library providing a process monad
 for shell scripting in OCaml as well as a simple s-expression based
 shell interpreter. Both provides good debugging support.
 
-Shexp works on both Unix and Windows and has no dependencies outside
-of the compiler distributions.
+Shexp works on both Unix and Windows and depends only on Base.
 
 ** The Shexp_process library
 

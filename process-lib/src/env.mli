@@ -82,7 +82,7 @@ val with_file
 
 val chmod    : t -> string -> perm:int -> unit
 val chown    : t -> string -> uid:int -> gid:int -> unit
-val mkdir    : t -> ?perm:int -> string -> unit
+val mkdir    : t -> ?perm:int -> ?p:bool -> string -> unit
 val rm       : t -> string -> unit
 val rmdir    : t -> string -> unit
 val mkfifo   : t -> ?perm:int -> string -> unit

@@ -840,12 +840,13 @@ let mkdir =
   let prim =
     Prim.make "mkdir"
       [ O ("perm", Posixat.File_perm.sexp_of_t, 0o777)
+      ; O ("p", sexp_of_bool, false)
       ; A sexp_of_string
       ]
       Unit
-      (fun env perm path -> Env.mkdir env path ~perm)
+      (fun env perm p path -> Env.mkdir env path ~perm ~p)
   in
-  fun ?(perm=0o777) path -> pack2 prim perm path
+  fun ?(perm=0o777) ?p path -> pack3 prim perm (p <> None) path
 
 let rm =
   let prim =

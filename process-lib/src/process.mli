@@ -327,7 +327,7 @@ val with_temp_dir : prefix:string -> suffix:string -> (string -> 'a t) -> 'a t
 
 val chmod       : string -> perm:Unix.file_perm -> unit t
 val chown       : string -> uid:int -> gid:int -> unit t
-val mkdir       : ?perm:Unix.file_perm -> string -> unit t
+val mkdir       : ?perm:Unix.file_perm -> ?p:unit -> string -> unit t
 val rm          : string -> unit t
 val rmdir       : string -> unit t
 val mkfifo      : ?perm:Unix.file_perm -> string -> unit t

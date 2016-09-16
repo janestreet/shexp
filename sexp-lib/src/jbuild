@@ -1,6 +1,6 @@
 (library
  ((name shexp_sexp)
   (public_name shexp.sexp)
-  ;; No deps outside of the compiler distribution!
-  (libraries (sexp0))
+  ;; No deps outside of base!
+  (libraries (base))
   (preprocess ((no_preprocessing All)))))

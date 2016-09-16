@@ -354,12 +354,24 @@ let with_file t ?perm ~flags path ~f =
   | x           -> Unix.close fd; x
   | exception e -> close_noerr fd; raise e
 
-let mkdir t ?(perm=0o777) path =
+let mkdir_one t ~perm path =
   match full_path t path with
   | Path path ->
     Unix.mkdir path perm
   | In_dir (dir,  path) ->
     Posixat.mkdirat ~dir ~path ~perm
+
+let rec mkdir t ?(perm=0o777) ?(p=false) path =
+  if not p then
+    mkdir_one t path ~perm
+  else
+    try
+      mkdir_one t path ~perm
+    with
+    | Unix.Unix_error((EEXIST|EISDIR) , _, _) -> ()
+    | Unix.Unix_error(ENOENT, _, _) when Filename.basename path <> path ->
+      mkdir t (Filename.dirname path) ~perm ~p;
+      mkdir_one t path ~perm
 
 let chmod t path ~perm =
   match full_path t path with

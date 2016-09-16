@@ -46,23 +46,12 @@ package "process" (
 package "sexp" (
   version = "$(pkg_version)"
   description = ""
-  requires = "shexp.sexp0"
+  requires = "base"
   archive(byte  ) = "shexp_sexp.cma"
   archive(native) = "shexp_sexp.cmxa"
   plugin(byte  ) = "shexp_sexp.cma"
   plugin(native) = "shexp_sexp.cmxs"
   exists_if = "shexp_sexp.cma"
-)
-
-package "sexp0" (
-  version = "$(pkg_version)"
-  description = ""
-  requires = ""
-  archive(byte  ) = "sexp0.cma"
-  archive(native) = "sexp0.cmxa"
-  plugin(byte  ) = "sexp0.cma"
-  plugin(native) = "sexp0.cmxs"
-  exists_if = "sexp0.cma"
 )
 
 package "spawn" (
