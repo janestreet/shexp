@@ -1,8 +1,8 @@
-[[shexp][/images/logo.png]]
+* SHEXP - shell scripting for OCaml
 
 Shexp is composed of two parts: a library providing a process monad
 for shell scripting in OCaml as well as a simple s-expression based
-shell interpreter. Both provides good debugging support.
+shell interpreter. Both provide good debugging support.
 
 Shexp works on both Unix and Windows and depends only on Base.
 
@@ -21,9 +21,9 @@ with large processes.
 
 *** Usage
 
-One create a value of type ='a Process.t= which represent a process
+One creates a value of type ='a Process.t= which represent a process
 pipeline. Using the combinators of the process module, one can modify
-the execution environemt (current working directory, environment
+the execution environment (current working directory, environment
 variables, ...) as well as construct complex redirections.
 
 To effectively execute the pipeline and get a result, one has to call
@@ -46,7 +46,7 @@ val pipe_both : 'a t -> 'b t -> ('a * 'b) t
 val read_all : string t
 
 (** [chdir dir k] exexutes [k] with the current directory set to [dir] *)
-val chdir : stirng -> 'a t -> 'a t
+val chdir : string -> 'a t -> 'a t
 #+end_src
 
 For instance, to run an external command in a given directory and
@@ -59,7 +59,7 @@ let f ~dir prog args = eval (chdir dir (run prog args |- real_all))
 *** Debugging
 
 Shexp_process allows one to plug a debugger in the evaluator. A
-debugger is essentially a set of hooks called at the approrioate
+debugger is essentially a set of hooks called at the appropriate
 places by Shexp_process. Shexp_process itself provides two
 non-interactive debuggers: a logger and a tracer.
 
@@ -103,24 +103,7 @@ would produce the following trace:
 
 Shexp defines a few other libraries that can be used independently.
 
-*** Shexp_spawn
-
-Shexp_spawn is a small library exposing only one function:
-=Shexp_spawn.spawn=. Its purpose is to start command in the
-background. Shexp_spawn aims to provide a few missing features of
-=Unix.create_process= such as providing a working directory as well as
-improving errors reporting and performances.
-
-Errors such as directory or program not found are properly reported as
-=Unix.Unix_error= exceptions, on both Unix and Windows.
-
-On Unix, Shexp_spawn uses =vfork= by default as it is often a lot
-faster than fork. There is a benchmark comparing =Shexp_spawn.spawn=
-to =Unix.create_process= in =spawn-lib/bench=. If you don't trust
-=vfork=, you can set the environment variable =SHEXP_USE_FORK= to make
-Shexp_spawn use =fork= instead.
-
 *** Shexp_posixat
 
 This library simply binds the various *at posix functions. None of
-these function is implemented on Windows.
+these function are implemented on Windows.

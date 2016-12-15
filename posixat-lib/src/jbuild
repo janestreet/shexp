@@ -4,7 +4,7 @@
   (c_names (posixat_stubs posixat_generated_stubs))
   ;; No deps outside of the compiler distribution!
   (libraries (shexp_bigstring_io shexp_sexp))
-  (preprocess ((no_preprocessing All)))))
+  (preprocess no_preprocessing)))
 
 (rule
  ((targets (posixat_generated_stubs.c))

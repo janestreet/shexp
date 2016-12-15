@@ -1,6 +1,6 @@
 open StdLabels
 
-type t = Base0.Sexp.t = Atom of string | List of t list
+type t = Base.Exported_for_specific_uses.Sexplib.Sexp.t = Atom of string | List of t list
 
 let list f l = List (List.map l ~f)
 let option f o =
@@ -45,5 +45,5 @@ let rec to_string = function
   | Atom s -> if must_escape s then sprintf "%S" s else s
   | List l -> sprintf "(%s)" (List.map l ~f:to_string |> String.concat ~sep:" ")
 
-let register_exn_converter ec f = Base0.Sexplib.Conv.Exn_converter.add ec f
-let exn = Base0.Sexplib.Conv.sexp_of_exn
+let register_exn_converter a b = Base.Exported_for_specific_uses.Sexplib.Conv.Exn_converter.add a b
+let exn = Base.Exported_for_specific_uses.Sexplib.Conv.sexp_of_exn

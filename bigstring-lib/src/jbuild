@@ -4,4 +4,4 @@
   (c_names (bigstring_stubs))
   ;; No deps outside of the compiler distribution!
   (libraries (bigarray))
-  (preprocess ((no_preprocessing All)))))
+  (preprocess no_preprocessing)))

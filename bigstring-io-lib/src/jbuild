@@ -4,4 +4,4 @@
   (c_names (bigstring_io_stubs))
   ;; No deps outside of the compiler distribution!
   (libraries (shexp_bigstring))
-  (preprocess ((no_preprocessing All)))))
+  (preprocess no_preprocessing)))

@@ -1,5 +1,4 @@
 open Import
-open Shexp_posixat.Std
 
 module Working_dir_spec = struct
   type t =
@@ -294,13 +293,13 @@ let spawn t ~prog ~args =
       SMap.fold t.unix_env.entries ~init:[] ~f:(fun ~key ~data acc ->
         sprintf "%s=%s" key data :: acc)
     in
-    let cwd : Shexp_spawn.Working_dir.t =
+    let cwd : Spawn.Working_dir.t =
       match t.cwd.physical with
       | Win32 -> Path t.cwd.logical
       | Unix u -> Fd u.fd
     in
     let pid =
-      Shexp_spawn.spawn ()
+      Spawn.spawn ()
         ~env
         ~cwd
         ~prog
@@ -342,7 +341,7 @@ let full_path2 t path1 path2 =
 let open_file t ?(perm=0) ~flags path =
   match full_path t path with
   | Path path ->
-    Unix.openfile path (Unix.O_CLOEXEC :: flags) perm
+    Unix.openfile path (O_CLOEXEC :: flags) perm
   | In_dir (dir,  path) ->
     Posixat.openat ~dir ~path ~flags:(O_CLOEXEC :: flags) ~perm
 
@@ -432,14 +431,14 @@ let rename t oldpath newpath =
 let stat t path =
   match full_path t path with
   | Path path ->
-    Unix.LargeFile.stat path
+    Unix.stat path
   | In_dir (dir,  path) ->
     Posixat.fstatat ~dir ~path ~flags:[]
 
 let lstat t path =
   match full_path t path with
   | Path path ->
-    Unix.LargeFile.lstat path
+    Unix.lstat path
   | In_dir (dir,  path) ->
     Posixat.fstatat ~dir ~path ~flags:[AT_SYMLINK_NOFOLLOW]
 

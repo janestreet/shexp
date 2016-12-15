@@ -10,10 +10,10 @@ type 'a t
 
 (** Execution contexts *)
 module Context : sig
-  (** A evaluation context represent all the informations maintained by shexp_process in
+  (** An evaluation context represent all the information maintained by shexp_process in
       order to evaluate a process description.
 
-      This consist on:
+      This consists of:
       - stdin, stdout, stderr
       - the current working directory
       - the unix environment variables
@@ -29,7 +29,7 @@ module Context : sig
                     }
   end
 
-  (** Creates a new execution context. Non-specified fields are capture from the
+  (** Creates a new execution context. Non-specified fields are captured from the
       environment of current running program. *)
   val create
     :  ?stdin:Unix.file_descr
@@ -94,14 +94,14 @@ module Prim : sig
     type ('a, 'b) t = ('a, 'b) Prim.Args.t
   end
 
-  (** Return a s-expression representation of a primitive call *)
+  (** Return an s-expression representation of a primitive call *)
   val sexp_of_call : ('a, 'b) t -> ('a, 'b) Args.t -> Sexp.t
 
   (** Returns [None] if the result is [Unit] or [Env] *)
   val sexp_of_result : ('a, 'b) t -> 'b -> Sexp.t option
 end
 
-(** shexp_process allows one to plugin a debugger in the evaluator. [Logged] and [Traced]
+(** shexp_process allows one to plug a debugger in the evaluator. [Logged] and [Traced]
     are essentially two non-interactive debuggers. *)
 module type Debugger = Debugger_intf.S
 
@@ -123,11 +123,11 @@ val return : 'a -> 'a t
 val bind : 'a t -> f:('a -> 'b t) -> 'b t
 val map : 'a t -> f:('a -> 'b) -> 'b t
 
-(** Create a process that fails with the given exception. Evaluation this process will
+(** Create a process that fails with the given exception. Evaluation of this process will
     raise this exception. *)
 val fail : exn -> _ t
 
-(** [fork a b] reprensents two process that are executed concurrently. The resulting
+(** [fork a b] reprensents two processes that are executed concurrently. The resulting
     process will block until both [a] and [b] have finished and will return both of their
     results.
 
@@ -135,7 +135,7 @@ val fail : exn -> _ t
     independently change the current working directory, change their standard out, etc...
 
     Regarding errors, if the evaluation of both processes fail, then only one the
-    exception will be kept. It is not specified which one. You should use [Traced] to get
+    exceptions will be kept. It is not specified which one. You should use [Traced] to get
     a full trace and see what exceptions are raised and where.
 *)
 val fork : 'a t -> 'b t -> ('a * 'b) t
@@ -178,7 +178,7 @@ val run_exit_code : string -> string list -> int t
 
 module Exit_status = Exit_status
 
-(** Run an external program and return it's exit status. *)
+(** Run an external program and return its exit status. *)
 val run_exit_status : string -> string list -> Exit_status.t t
 
 (** Run an external program, returns [true] if its exit code is part of [true_v] and
@@ -201,13 +201,13 @@ val get_env_exn : string -> string t
 val set_env : string -> string -> 'a t -> 'a t
 
 (** [set_env var value k] represents the process [k] evaluated in a context where the
-    envornment variable [var] is unset. *)
+    environment variable [var] is unset. *)
 val unset_env : string -> 'a t -> 'a t
 
 (** {1 Current working directory} *)
 
 (** Return the current working directory. Note that there is no guarantee that this
-    directory does exist. For instance if a component in this path has is renamed during
+    directory exists. For instance if a component in this path has is renamed during
     the evaluation of the process, then this will be a dangling directory. *)
 val cwd_logical : string t
 
@@ -272,7 +272,7 @@ val capture_unit : Std_io.t list -> unit t -> string t
 
 (** {1 Redirections} *)
 
-(** [redirect ios ?perm ~flags filename t] redirect the following ios to a file in
+(** [redirect ios ?perm ~flags filename t] redirects the following ios to a file in
     [t]. [perm] and [flags] are passed the same as for [Unix.openfile]. *)
 val redirect
   :  Std_io.t list
@@ -312,14 +312,14 @@ val temp_dir : string t
     current temporary directory is set to [dir]. *)
 val set_temp_dir : string -> 'a t -> 'a t
 
-(** [with_temp_file ~prefix ~suffix f] is a process that creates a temporary file and pass
-    it to [f]. The file is created inside the temporary directory.
+(** [with_temp_file ~prefix ~suffix f] is a process that creates a temporary file and
+    passes it to [f]. The file is created inside the temporary directory.
 
     When the process returned by [f] finishes, the file is removed.
 *)
 val with_temp_file : prefix:string -> suffix:string -> (string -> 'a t) -> 'a t
 
-(** Same as [with_temp_file] but create a directory. The directory and its contents is
+(** Same as [with_temp_file] but creates a directory. The directory and its contents are
     deleted when the process finishes. *)
 val with_temp_dir : prefix:string -> suffix:string -> (string -> 'a t) -> 'a t
 

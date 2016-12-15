@@ -3,7 +3,7 @@
     If we were to compile a script to an OCaml program, all functions would have to take
     this environment as argument. *)
 
-open Shexp_posixat.Std
+open Import
 
 type t
 
@@ -89,8 +89,8 @@ val mkfifo   : t -> ?perm:int -> string -> unit
 val link     : t -> string -> string -> unit
 val rename   : t -> string -> string -> unit
 val symlink  : t -> string -> string -> unit
-val stat     : t -> string -> Unix.LargeFile.stats
-val lstat    : t -> string -> Unix.LargeFile.stats
+val stat     : t -> string -> Unix.stats
+val lstat    : t -> string -> Unix.stats
 val readlink : t -> string -> string
 val readdir  : t -> string -> string list
 val access   : t -> string -> Unix.access_permission list -> unit

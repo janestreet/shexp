@@ -9,8 +9,9 @@ module Logger : sig
   val create : (Sexp.t -> unit) -> t
 end
 
-(** Produce a full execution trace. The order of the trace is independant of the order in
-    which command are executed in different threads, so is suitable for expect tests. *)
+(** Produce a full execution trace. The order of the trace is independent of the order in
+    which commands are executed in different threads, so it is suitable for expect tests.
+*)
 module Tracer : sig
   include S
 

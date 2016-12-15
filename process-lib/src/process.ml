@@ -1,5 +1,4 @@
 open Import
-open Shexp_posixat.Std
 
 let with_lock mutex ~f =
   Mutex.lock mutex;
@@ -724,7 +723,7 @@ let iter_chunks ~sep f = fold_chunks ~sep ~init:() ~f:(fun () line -> f line)
 let create_pipe =
   let prim =
     Prim.make "create-pipe" [] (F (Sexp.pair Posixat.Fd.sexp_of_t Posixat.Fd.sexp_of_t))
-      (fun _ -> Shexp_spawn.safe_pipe ())
+      (fun _ -> retry_eintr1 W.(pair fd fd) Spawn.safe_pipe ())
   in
   pack0 prim
 

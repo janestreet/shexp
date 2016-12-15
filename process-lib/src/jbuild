@@ -4,9 +4,9 @@
   ;; No deps outside of the compiler distribution!
   (libraries (unix
               threads
+              spawn
               shexp_sexp
-              shexp_spawn
               shexp_bigstring
               shexp_bigstring_io
               shexp_posixat))
-  (preprocess ((no_preprocessing All)))))
+  (preprocess no_preprocessing)))

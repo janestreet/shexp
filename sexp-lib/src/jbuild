@@ -3,4 +3,4 @@
   (public_name shexp.sexp)
   ;; No deps outside of base!
   (libraries (base))
-  (preprocess ((no_preprocessing All)))))
+  (preprocess no_preprocessing)))
