@@ -3,5 +3,5 @@
   (public_name shexp.bigstring-io)
   (c_names (bigstring_io_stubs))
   ;; No deps outside of the compiler distribution!
-  (libraries (shexp_bigstring))
+  (libraries (shexp_bigstring unix))
   (preprocess no_preprocessing)))
