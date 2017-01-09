@@ -53,7 +53,7 @@ For instance, to run an external command in a given directory and
 capture its standard output, where =|-= is infix operator for =pipe=:
 
 #+begin_src ocaml
-let f ~dir prog args = eval (chdir dir (run prog args |- real_all))
+let f ~dir prog args = eval (chdir dir (run prog args |- read_all))
 #+end_src
 
 *** Debugging
