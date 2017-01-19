@@ -569,6 +569,56 @@ let waitpid pid : Exit_status.t =
   | WSIGNALED n -> Signaled n
   | WSTOPPED  _ -> assert false
 
+module Background_command = struct
+  type t =
+    { mutex        : Mutex.t
+    ; pid          : int
+    ; mutable wait : Exit_status.t Lazy.t
+    }
+
+  let sexp_of_t t = sexp_of_string (Printf.sprintf "[%d]" t.pid)
+
+  let create pid =
+    { mutex = Mutex.create ()
+    ; pid
+    ; wait = lazy (waitpid pid)
+    }
+
+  let pid t = t.pid
+
+  let wait t =
+    Mutex.lock t.mutex;
+    protectx t.mutex ~finally:Mutex.unlock ~f:(fun _ ->
+      Lazy.force t.wait)
+end
+
+let spawn =
+  let prim =
+    Prim.make "spawn"
+      [ A sexp_of_string
+      ; A (sexp_of_list sexp_of_string)
+      ]
+      (F Background_command.sexp_of_t)
+      (fun env prog args ->
+         match Env.spawn env ~prog ~args with
+         | Ok pid -> Background_command.create pid
+         | Error Command_not_found ->
+           Printf.ksprintf failwith "%s: command not found" (quote_for_errors prog))
+  in
+  fun prog args -> pack2 prim prog args
+
+let wait =
+  let prim =
+    Prim.make "wait"
+      [ A Background_command.sexp_of_t
+      ]
+      (F Exit_status.sexp_of_t)
+      (fun _ bc -> Background_command.wait bc)
+  in
+  fun bc -> pack1 prim bc
+
+(* This could be implemented in term of [spawn] followed by a [wait], but doing it in one
+   primitive improve traces. *)
 let run_exit_status =
   let prim =
     Prim.make "run"

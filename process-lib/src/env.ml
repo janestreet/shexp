@@ -288,7 +288,7 @@ type run_error =
 let spawn t ~prog ~args =
   match find_executable t prog with
   | None -> Error Command_not_found
-  | Some prog ->
+  | Some real_prog ->
     let env =
       SMap.fold t.unix_env.entries ~init:[] ~f:(fun ~key ~data acc ->
         sprintf "%s=%s" key data :: acc)
@@ -302,7 +302,7 @@ let spawn t ~prog ~args =
       Spawn.spawn ()
         ~env
         ~cwd
-        ~prog
+        ~prog:real_prog
         ~argv:(prog :: args)
         ~stdin:t.stdin
         ~stdout:t.stdout

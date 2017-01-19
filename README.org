@@ -1,4 +1,4 @@
-* SHEXP - shell scripting for OCaml
+[[shexp][/images/logo.png]]
 
 Shexp is composed of two parts: a library providing a process monad
 for shell scripting in OCaml as well as a simple s-expression based

@@ -190,6 +190,19 @@ val run_bool
   -> string list
   -> bool t
 
+module Background_command : sig
+  type t
+
+  val pid  : t -> int
+end
+
+(** Start an external program but do not wait for its termination. If you never call
+    [wait] on the result, the process will become a zombie after it terminates. *)
+val spawn : string -> string list -> Background_command.t t
+
+(** Wait for a background command to terminate and return its exit status. *)
+val wait : Background_command.t -> Exit_status.t t
+
 (** {1 Unix environment} *)
 
 (** Return the value associated to the given environment variable. *)
