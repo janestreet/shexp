@@ -11,18 +11,14 @@ let show t =
 let%expect_test "command not found" =
   show (P.run "command-that-doesnt-exist" []);
   [%expect {|
-    (raised (exn (Failure "command-that-doesnt-exist: command not found")))
+    (raised (Failure "command-that-doesnt-exist: command not found"))
   |}]
 
 let%expect_test "file not found" =
   show (P.stdin_from "/file-that-doesnt-exist" P.read_all);
   [%expect {|
     (raised (
-      exn (
-        Unix.Unix_error
-        "No such file or directory"
-        openat
-        /file-that-doesnt-exist)))
+      Unix.Unix_error "No such file or directory" openat /file-that-doesnt-exist))
   |}]
 
 let%expect_test "multiple errors" =
@@ -32,5 +28,5 @@ let%expect_test "multiple errors" =
                 (P.get_env_exn "A")
                 (P.get_env_exn "B"))));
   [%expect {|
-    (raised (exn (Failure "environment variable \"A\" not found")))
+    (raised (Failure "environment variable \"A\" not found"))
   |}]
