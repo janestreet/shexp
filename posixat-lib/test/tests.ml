@@ -1,4 +1,4 @@
-open Core.Std
+open Core
 open Shexp_posixat.Std
 open! Expect_test_helpers_kernel
 

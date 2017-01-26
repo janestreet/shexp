@@ -1,4 +1,4 @@
-open Core.Std
+open Core
 include Shexp_process.Std
 
 module P = Process
