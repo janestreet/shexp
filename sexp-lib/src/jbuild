@@ -4,3 +4,5 @@
   ;; No deps outside of base!
   (libraries (base))
   (preprocess no_preprocessing)))
+
+(jbuild_version jane_street)

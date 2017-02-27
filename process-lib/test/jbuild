@@ -5,3 +5,5 @@
   (libraries (shexp_process
               core
               expect_test_helpers_kernel))))
+
+(jbuild_version jane_street)

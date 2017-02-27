@@ -5,3 +5,5 @@
   ;; No deps outside of the compiler distribution!
   (libraries (bigarray))
   (preprocess no_preprocessing)))
+
+(jbuild_version jane_street)

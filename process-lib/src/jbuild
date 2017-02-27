@@ -10,3 +10,5 @@
               shexp_bigstring_io
               shexp_posixat))
   (preprocess no_preprocessing)))
+
+(jbuild_version jane_street)

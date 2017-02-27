@@ -15,3 +15,5 @@
  ((targets (posixat_generated.ml))
   (deps    (gen/gen.exe))
   (action "${<} ml > ${@}")))
+
+(jbuild_version jane_street)

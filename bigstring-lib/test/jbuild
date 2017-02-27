@@ -1,3 +1,5 @@
 (library
  ((name shexp_bigstring_test)
   (libraries (shexp_bigstring core expect_test_helpers_kernel))))
+
+(jbuild_version jane_street)

@@ -1,3 +1,5 @@
 (library
  ((name shexp_process_bench)
   (libraries (core shexp_process))))
+
+(jbuild_version jane_street)
