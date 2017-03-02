@@ -1,5 +1,6 @@
 (library
  ((name shexp_bigstring_io_test)
-  (libraries (shexp_bigstring_io core expect_test_helpers_kernel unix))))
+  (libraries (shexp_bigstring_io core expect_test_helpers_kernel unix))
+  (preprocess (pps (ppx_jane)))))
 
 (jbuild_version jane_street)

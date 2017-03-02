@@ -11,7 +11,7 @@ Shexp works on both Unix and Windows and depends only on Base.
 The Shexp_process library exposes a single =Process= module allowing
 one to construct complex pipelines such as pipes and other
 redirections. It is intended to replace shell scripts as well as
-provide a more complete alternative to =Async.Std.Process= like
+provide a more complete alternative to =Async.Process= like
 modules.
 
 On Unix, Shexp_process uses the specific *at system calls (such as
@@ -99,11 +99,3 @@ would produce the following trace:
 )
 #+end_src
 
-** Other libraries
-
-Shexp defines a few other libraries that can be used independently.
-
-*** Shexp_posixat
-
-This library simply binds the various *at posix functions. None of
-these function are implemented on Windows.

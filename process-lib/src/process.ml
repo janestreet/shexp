@@ -36,7 +36,7 @@ module Context = struct
   let use_env t =
     with_lock t.mutex ~f:(fun () ->
       match t.state with
-      | Disposed -> failwith "Shexp_process.Std.Process.Context: \
+      | Disposed -> failwith "Shexp_process: \
                               trying to use a disposed context"
       | Active env -> Env.add_cwd_ref env; env)
 end

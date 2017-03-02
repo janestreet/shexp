@@ -1,6 +1,0 @@
-(executables
- ((names (gen))
-  (libraries ())
-  (preprocess no_preprocessing)))
-
-(jbuild_version jane_street)

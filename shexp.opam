@@ -11,6 +11,7 @@ build: [
 depends: [
   "base"
   "jbuilder"
+  "posixat"
   "spawn"
   "base-threads"
 ]

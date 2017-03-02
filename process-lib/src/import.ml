@@ -105,7 +105,7 @@ module Unix = struct
 end
 
 module Posixat = struct
-  open Shexp_posixat.Std.Posixat
+  open Posixat
 
   module Fd                = Fd
   module Open_flag         = Open_flag

@@ -1,5 +1,5 @@
 open Core
-include Shexp_process.Std
+module Process = Shexp_process
 
 module P = Process
 include P.Infix
