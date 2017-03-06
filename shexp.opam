@@ -10,7 +10,7 @@ build: [
 ]
 depends: [
   "base"
-  "jbuilder"
+  "jbuilder"     {build}
   "posixat"
   "spawn"
   "base-threads"
