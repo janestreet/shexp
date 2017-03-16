@@ -1,4 +1,5 @@
 opam-version: "1.2"
+version: "v0.9.0"
 maintainer: "opensource@janestreet.com"
 authors: ["Jane Street Group, LLC <opensource@janestreet.com>"]
 homepage: "https://github.com/janestreet/shexp"
@@ -9,10 +10,10 @@ build: [
   ["jbuilder" "build" "--only-packages" "shexp" "--root" "." "-j" jobs "@install"]
 ]
 depends: [
-  "base"
+  "base"         {>= "v0.9" & < "v0.10"}
   "jbuilder"     {build & >= "1.0+beta2"}
-  "posixat"
-  "spawn"
+  "posixat"      {>= "v0.9" & < "v0.10"}
+  "spawn"        {>= "v0.9" & < "v0.10"}
   "base-threads"
 ]
 available: [ ocaml-version >= "4.03.0" ]
