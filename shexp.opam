@@ -15,7 +15,7 @@ depends: [
   "spawn"
   "base-threads"
 ]
-available: [ ocaml-version >= "4.03.0" ]
+available: [ ocaml-version >= "4.04.1" ]
 descr: "
 Process library and s-expression based shell
 
