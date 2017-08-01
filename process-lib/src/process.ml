@@ -657,6 +657,20 @@ let run_bool ?(true_v=[0]) ?(false_v=[1]) prog args =
     Printf.ksprintf failwith "Command exited with unexpected code %d: %s"
       code (cmd_line prog args)
 
+let find_executable =
+  let prim =
+    Prim.make "find-executable"
+      [A sexp_of_string]
+      (F (sexp_of_option sexp_of_string))
+      Env.find_executable
+  in
+  fun exe -> pack1 prim exe
+
+let find_executable_exn exe =
+  find_executable exe >>| function
+  | None -> Printf.ksprintf failwith "command %S not found" exe
+  | Some x -> x
+
 let get_env =
   let prim =
     Prim.make "get-env"

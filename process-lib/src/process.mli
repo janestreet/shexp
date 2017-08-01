@@ -205,6 +205,10 @@ val wait : Background_command.t -> Exit_status.t t
 
 (** {1 Unix environment} *)
 
+(** Return the absolute path to the given command. *)
+val find_executable : string -> string option t
+val find_executable_exn : string -> string t
+
 (** Return the value associated to the given environment variable. *)
 val get_env : string -> string option t
 val get_env_exn : string -> string t
