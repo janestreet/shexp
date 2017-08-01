@@ -32,6 +32,7 @@ val add_cwd_ref : t -> unit
 val deref_cwd : t -> unit
 
 (** Unix environment *)
+val find_executable : t -> string -> string option
 val get_env : t -> string -> string option
 val set_env : t -> string -> string -> t
 val unset_env : t -> string -> t
