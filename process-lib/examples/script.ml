@@ -1,5 +1,7 @@
-#!/usr/bin/env ocaml -noinit -w +a
+#!/usr/bin/env ocaml
+(* TODO: pass -noinit to ocaml toplevel *)
 #use "topfind"
+#warnings "+a"
 #thread
 (* #require "ppx_jane,core" *)
 #require "shexp.process"
