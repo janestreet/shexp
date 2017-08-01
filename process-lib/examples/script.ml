@@ -8,11 +8,9 @@ open Shexp_process
 open Shexp_process.Infix
 (* open Core *)
 
-(* Check if cmd is in PATH *)
-let command (cmd: string) : bool t =
-  run_exit_code "command" ["-v"; cmd]
-  |> outputs_to "/dev/null"
-  >>| fun code -> code = 0
+(* Check if exe is in PATH *)
+let command (exe: string) : bool t =
+  find_executable exe >>| fun exe -> exe <> None
 
 (* Finds all files with the given extension in the git repo (or subdirs) *)
 let find_files ~(ext: string) : unit t =
