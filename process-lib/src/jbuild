@@ -2,6 +2,7 @@
  ((name shexp_process)
   (public_name shexp.process)
   ;; No deps outside of the compiler distribution!
+(flags (:standard -safe-string))
   (libraries (unix
               threads
               spawn

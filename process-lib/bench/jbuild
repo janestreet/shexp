@@ -1,5 +1,6 @@
 (library
  ((name shexp_process_bench)
+(flags (:standard -safe-string))
   (libraries (core shexp_process))
   (preprocess (pps (ppx_jane ppx_driver.runner)))))
 
