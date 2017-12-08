@@ -1,4 +1,5 @@
 opam-version: "1.2"
+version: "v0.10.0"
 maintainer: "opensource@janestreet.com"
 authors: ["Jane Street Group, LLC <opensource@janestreet.com>"]
 homepage: "https://github.com/janestreet/shexp"
@@ -9,9 +10,9 @@ build: [
   ["jbuilder" "build" "-p" name "-j" jobs]
 ]
 depends: [
-  "base"
-  "posixat"
-  "spawn"
+  "base"         {>= "v0.10" & < "v0.11"}
+  "posixat"      {>= "v0.10" & < "v0.11"}
+  "spawn"        {>= "v0.10" & < "v0.11"}
   "base-threads"
   "jbuilder"     {build & >= "1.0+beta12"}
 ]
