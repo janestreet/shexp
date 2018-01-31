@@ -71,3 +71,11 @@ let%expect_test "rename current directory" =
     physical current working directory after rename: "<tempdir>/blah-new"
     file foo contains "Hello, world!\n"
   |}]
+
+let%expect_test "rm_rf deletes everything" =
+  eval_exn rm_rf;
+  [%expect {|
+      tmp dir contents:
+      - .
+ |}]
+

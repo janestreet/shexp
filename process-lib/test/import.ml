@@ -55,16 +55,17 @@ let cleanup_sexp =
   in
   map
 
+let find dir =
+  let open P in
+  printf "\ntmp dir contents:\n"
+  >> chdir dir
+       (run "find" []
+        |- run "sort" []
+        |- iter_lines (printf "- %s\n"))
+  >> printf "\n"
+
 let rename_current_directory =
   let open P in
-  let find dir =
-    printf "\ntmp dir contents:\n"
-    >> chdir dir
-         (run "find" []
-          |- run "sort" []
-          |- iter_lines (printf "- %s\n"))
-    >> printf "\n"
-  in
   with_temp_dir ~prefix:"shexp_process_test" ~suffix:tmpdir_suffix
     (fun tmpdir ->
        chdir tmpdir
@@ -89,3 +90,13 @@ let rename_current_directory =
                   printf "physical current working directory after rename: %S\n" p)
                 >> stdin_from "foo" read_all
                 >>= printf "file foo contains %S\n")))
+
+let rm_rf =
+  let open P in
+  with_temp_dir ~prefix:"shexp_process_test" ~suffix:tmpdir_suffix
+    (fun tmpdir ->
+       chdir tmpdir
+         (mkdir "test"
+          >> rm_rf "test"
+          >> find tmpdir))
+

@@ -1026,16 +1026,18 @@ let file_exists =
   fun path -> pack1 prim path
 
 let rec rm_rf path =
-  chdir path
-    (readdir "." >>= fun l ->
-     List0.iter l ~f:(fun fname ->
-       lstat fname >>= fun stat ->
-       match stat.st_kind with
-       | S_DIR ->
-         rm_rf fname >>= fun () ->
-         rmdir fname
-       | _ ->
-         rm fname))
+  readdir path >>= fun l ->
+  List0.iter l ~f:(fun fname ->
+    (* readdir does not give us "." and ".." *)
+    let fpath = path ^/ fname in
+    lstat fpath >>= fun stat ->
+    match stat.st_kind with
+    | S_DIR ->
+      rm_rf fpath
+    | _ ->
+      rm fpath)
+  >>= fun () ->
+  rmdir path
 
 let temp_dir_var = if Sys.win32 then "TEMP" else "TMPDIR"
 let temp_dir_default = if Sys.win32 then "." else "/tmp"
