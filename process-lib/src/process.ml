@@ -617,11 +617,15 @@ let wait =
   in
   fun bc -> pack1 prim bc
 
+(* [command_xxx] functions are only auxiliary functions to be used to
+   create [run_xxx] and [call_xxx] functions; the first argument is the
+   name of the function for tracing purpose. *)
+
 (* This could be implemented in term of [spawn] followed by a [wait], but doing it in one
    primitive improve traces. *)
-let run_exit_status =
+let command_exit_status cmd_string =
   let prim =
-    Prim.make "run"
+    Prim.make cmd_string
       [ A sexp_of_string
       ; A (sexp_of_list sexp_of_string)
       ]
@@ -633,22 +637,22 @@ let run_exit_status =
            Printf.ksprintf failwith "%s: command not found" (quote_for_errors prog))
   in
   fun prog args -> pack2 prim prog args
-
-let run_exit_code prog args =
-  run_exit_status prog args >>| function
+    
+let command_exit_code cmd_string prog args =
+  command_exit_status cmd_string prog args >>| function
   | Exited n -> n
   | Signaled signal ->
     Printf.ksprintf failwith "Command got signal %d: %s"
       signal (cmd_line prog args)
 
-let run prog args =
-  run_exit_code prog args >>| fun code ->
+let command cmd_string prog args =
+  command_exit_code cmd_string prog args >>| fun code ->
   if code <> 0 then
     Printf.ksprintf failwith "Command exited with code %d: %s"
       code (cmd_line prog args)
 
-let run_bool ?(true_v=[0]) ?(false_v=[1]) prog args =
-  run_exit_code prog args >>| fun code ->
+let command_bool ?(true_v=[0]) ?(false_v=[1]) cmd_string prog args =
+  command_exit_code cmd_string prog args >>| fun code ->
   if List.mem code ~set:true_v then
     true
   else if List.mem code ~set:false_v then
@@ -657,6 +661,46 @@ let run_bool ?(true_v=[0]) ?(false_v=[1]) prog args =
     Printf.ksprintf failwith "Command exited with unexpected code %d: %s"
       code (cmd_line prog args)
 
+let run_exit_status prog args =
+  command_exit_status "run" prog args
+    
+let run_exit_code prog args =
+  command_exit_code "run" prog args
+
+let run prog args =
+  command "run" prog args
+
+let run_bool ?(true_v=[0]) ?(false_v=[1]) prog args =
+  command_bool ~true_v ~false_v "run" prog args
+
+(* generic function that interprets the format string, splits into and
+   then produces a call to a 'run' function (as defined above). *)
+let generic_call ~f fmt =
+  let get_prog_args cmd_string = 
+    let strings = (* split into a list that may contain spurious empty strings that we remove *)
+      Base.String.split_on_chars cmd_string ~on:[' '; '\t'; '\n'; '\r'] 
+      |> Base.List.concat_map ~f:(function "" -> [] | s -> [s])
+    in
+    match strings with
+    | [] ->
+      Printf.ksprintf failwith "Called command resolves to empty string: %S" cmd_string
+    | prog::args -> f prog args
+  in
+  Printf.ksprintf get_prog_args fmt
+        
+let call_exit_status fmt =
+  generic_call ~f:(command_exit_status "call") fmt
+      
+let call_exit_code fmt =
+  generic_call ~f:(command_exit_code "call") fmt
+    
+let call_bool ?(true_v=[0]) ?(false_v=[1]) fmt =
+  generic_call ~f:(command_bool ~true_v ~false_v "call") fmt
+
+let call fmt =
+  generic_call ~f:(command "call") fmt
+
+      
 let find_executable =
   let prim =
     Prim.make "find-executable"
@@ -1131,6 +1175,12 @@ let sleep =
     Prim.make "sleep" [A sexp_of_float] Unit (fun _ d -> Unix.sleepf d)
   in
   fun d -> pack1 prim d
+
+let backquote ?context fmt =
+  let f prog args =
+    eval ?context (pipe (command "backquote" prog args) read_all)
+  in
+  generic_call ~f fmt
 
 module Infix = struct
   include Infix0
