@@ -651,7 +651,7 @@ let command cmd_string prog args =
     Printf.ksprintf failwith "Command exited with code %d: %s"
       code (cmd_line prog args)
 
-let command_bool ?(true_v=[0]) ?(false_v=[1]) cmd_string prog args =
+let command_bool cmd_string ?(true_v=[0]) ?(false_v=[1]) prog args =
   command_exit_code cmd_string prog args >>| fun code ->
   if List.mem code ~set:true_v then
     true
@@ -661,17 +661,21 @@ let command_bool ?(true_v=[0]) ?(false_v=[1]) cmd_string prog args =
     Printf.ksprintf failwith "Command exited with unexpected code %d: %s"
       code (cmd_line prog args)
 
-let run_exit_status prog args =
-  command_exit_status "run" prog args
+let run_exit_status =
+  let cmd = command_exit_status "run" in
+  fun prog args -> cmd prog args
     
-let run_exit_code prog args =
-  command_exit_code "run" prog args
+let run_exit_code =
+  let cmd = command_exit_code "run" in
+  fun prog args -> cmd prog args
 
-let run prog args =
-  command "run" prog args
+let run =
+  let cmd = command "run" in
+  fun prog args -> cmd prog args
 
-let run_bool ?(true_v=[0]) ?(false_v=[1]) prog args =
-  command_bool ~true_v ~false_v "run" prog args
+let run_bool =
+  let cmd = command_bool "run" in
+  fun ?(true_v=[0]) ?(false_v=[1]) prog args -> cmd ~true_v ~false_v prog args 
 
 (* generic function that interprets the format string, splits into and
    then produces a call to a 'run' function (as defined above). *)
@@ -688,17 +692,21 @@ let generic_call ~f fmt =
   in
   Printf.ksprintf get_prog_args fmt
         
-let call_exit_status fmt =
-  generic_call ~f:(command_exit_status "call") fmt
+let call_exit_status =
+  let f prog args = command_exit_status "call" prog args in
+  fun fmt -> generic_call ~f fmt
       
-let call_exit_code fmt =
-  generic_call ~f:(command_exit_code "call") fmt
+let call_exit_code =
+  let f prog args = command_exit_code "call" prog args in
+  fun fmt -> generic_call ~f fmt
     
-let call_bool ?(true_v=[0]) ?(false_v=[1]) fmt =
-  generic_call ~f:(command_bool ~true_v ~false_v "call") fmt
+let call_bool =
+  let f ~true_v ~false_v prog args = command_bool "call" ~true_v ~false_v prog args in
+  fun ?(true_v=[0]) ?(false_v=[1]) fmt -> generic_call ~f:(f ~true_v ~false_v) fmt
 
-let call fmt =
-  generic_call ~f:(command "call") fmt
+let call =
+  let f prog args = command "call" prog args in
+  fun fmt -> generic_call ~f fmt
 
       
 let find_executable =
@@ -1176,11 +1184,13 @@ let sleep =
   in
   fun d -> pack1 prim d
 
-let backquote ?context fmt =
-  let f prog args =
-    eval ?context (pipe (command "backquote" prog args) read_all)
-  in
-  generic_call ~f fmt
+let backquote =
+  let cmd prog args = command "backquote" prog args in
+  fun ?context fmt ->
+    let f prog args =
+      eval ?context (pipe (cmd prog args) read_all)
+    in
+    generic_call ~f fmt
 
 module Infix = struct
   include Infix0
