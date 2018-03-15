@@ -1242,7 +1242,7 @@ let backquote =
   let cmd prog args = command "backquote" prog args in
   fun ?context fmt ->
     let f prog args =
-      eval ?context (pipe (cmd prog args) read_all)
+      eval ?context (capture_unit [Stdout] (cmd prog args))
     in
     generic_call ~f fmt
 
