@@ -207,19 +207,6 @@ val call_bool
   -> ('a, unit, string, bool t) format4
   -> 'a
 
-(** Like backquotes in Bash: [backquote fmt] is equivalent to [eval
-    (call fmt |- read_all)]. 
-
-    If [context] is not specified, a temporary one is created. If you
-    are calling [backquote] many times, then creating a context and
-    reusing it is more efficient. *)
-val backquote
-  : ?context:Context.t
-  -> ('a, unit, string, string) format4
-  -> 'a
-
-
-
 module Background_command : sig
   type t
 

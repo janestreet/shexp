@@ -1238,14 +1238,6 @@ let sleep =
   in
   fun d -> pack1 prim d
 
-let backquote =
-  let cmd prog args = command "backquote" prog args in
-  fun ?context fmt ->
-    let f prog args =
-      eval ?context (capture_unit [Stdout] (cmd prog args))
-    in
-    generic_call ~f fmt
-
 module Infix = struct
   include Infix0
 
