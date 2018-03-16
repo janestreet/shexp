@@ -10,7 +10,7 @@ let () =
     Sys.readdir "/proc/self/fd"
     |> Array.to_list
     |> List.map ~f:int_of_string
-    |> List.sort ~cmp:Int.compare
+    |> List.sort ~compare:Int.compare
   in
   List.iter (get_fds ()) ~f:(fun fd_num ->
     if fd_num >= 3 then
