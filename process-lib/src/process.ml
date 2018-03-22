@@ -676,91 +676,30 @@ let run =
 let run_bool =
   let cmd = command_bool "run" in
   fun ?(true_v=[0]) ?(false_v=[1]) prog args -> cmd ~true_v ~false_v prog args
-
-(* Function that parses a string into a list of command arguments. The function
-   splits on blanks but blanks are preserved when inside a single- or
-   double-quoted string. Escaping is not taken into account, meaning backslashes
-   in double-quoted strings are considered as any character.
-
-   The function works by filling a stack of already recognized "items" (called
-   program as well as its arguments) as well a current item that is under
-   recognition. Due to the nature of the algorithm, the list of items is
-   reversed and the items themselves too, so everything is reversed in one
-   stroke at th end. *)
-let parse_command =
-  let open Base in
-  let double = '"' in
-  let single = Char.of_string "'" in
-  let push elt stack = match elt with
-    | [] -> stack
-    | _ -> elt :: stack
-  in
-  let rec parse cmd len items current i =
-    if i >= len then            (* done *)
-      push current items
-    else
-      let c = String.get cmd i in
-      if Char.equal c single then
-        parse_single cmd len (push current items) [] (i + 1)
-      else if Char.equal c double then
-        parse_double cmd len (push current items) [] (i + 1)
-      else if Char.is_whitespace c then
-        parse cmd len (push current items) [] (i + 1)
-      else                      (* any other, incl. \ *)
-        parse cmd len items (c :: current) (i + 1)
-  and parse_double cmd len items current i =
-    if i >= len then         
-      Printf.ksprintf failwith "Called command is badly formed: %S" cmd
-    else
-      let c = String.get cmd i in
-      if Char.equal c double then
-        parse cmd len (push current items) [] (i + 1)
-      else
-        parse_double cmd len items (c :: current) (i + 1)
-  and parse_single cmd len items current i =
-    if i >= len then         
-      Printf.ksprintf failwith "Called command is badly formed: %S" cmd
-    else
-      let c = String.get cmd i in
-      if Char.equal c single then
-        parse cmd len (push current items) [] (i + 1)
-      else
-        parse_single cmd len items (c :: current) (i + 1)
-  in
-  fun cmd_string ->
-    parse cmd_string (String.length cmd_string) [] [] 0
-    |> List.rev_map ~f:(fun item -> List.rev item |> String.of_char_list)
-    
-(* generic function that interprets the format string, splits into and
-   then produces a call to a 'run' function (as defined above). *)
-let generic_call ~f fmt =
-  let get_prog_args cmd_string =
-    (* split into a list that may contain spurious empty strings that we remove
-       *)
-    let strings = parse_command cmd_string in
-    match strings with
-    | [] ->
-        Printf.ksprintf
-          failwith "Called command resolves to empty string: %S" cmd_string
-    | prog::args -> f prog args
-  in
-  Printf.ksprintf get_prog_args fmt
-        
+                     
 let call_exit_status =
-  let f prog args = command_exit_status "call" prog args in
-  fun fmt -> generic_call ~f fmt
-      
+  let cmd = command_exit_status "call" in
+  function
+    | [] -> failwith "call_exit_status: empty command"
+    | prog::args -> cmd prog args
+                      
 let call_exit_code =
-  let f prog args = command_exit_code "call" prog args in
-  fun fmt -> generic_call ~f fmt
+  let cmd = command_exit_code "call" in
+  function
+    | [] -> failwith "call_exit_code: empty command"
+    | prog::args -> cmd prog args
     
 let call_bool =
-  let f ~true_v ~false_v prog args = command_bool "call" ~true_v ~false_v prog args in
-  fun ?(true_v=[0]) ?(false_v=[1]) fmt -> generic_call ~f:(f ~true_v ~false_v) fmt
-
+  let cmd = command_bool "call" in
+  fun ?(true_v=[0]) ?(false_v=[1]) -> function  
+    | [] -> failwith "call_bool: empty command"
+    | prog::args -> cmd ~true_v ~false_v prog args
+                                                  
 let call =
-  let f prog args = command "call" prog args in
-  fun fmt -> generic_call ~f fmt
+  let cmd = command "call" in
+  function
+    | [] -> failwith "call: empty command"
+    | prog::args -> cmd prog args
 
       
 let find_executable =

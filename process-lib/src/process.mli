@@ -191,21 +191,22 @@ val run_bool
   -> bool t
 
 
-(** Same functions as the 'run' ones above, but take a format string
-    instead (advice: use quoted strings [{|...|}] to avoid escaping).
+(** Same functions as the 'run' ones above, but take a string list instead. This
+   way, the first element and the others are treated in a homogeneous way. It
+   can ease prepending commands in specific circumstances, e.g.  
+    [if profile then call ("time" :: command) else call command]
 
-    E.g. [call {|grep -i %s %s|} pattern filename] is equivalent to
-    [run "grep" ["-i"; pattern; filename]] *)
-val call : ('a, unit, string, unit t) format4 -> 'a
-val call_exit_code : ('a, unit, string, int t) format4 -> 'a
-val call_exit_status
-  : ('a, unit, string, Exit_status.t t) format4
-  -> 'a
+    E.g. [call ["grep"; "-i"; pattern filename]] is equivalent to [run "grep"
+   ["-i"; pattern; filename]] *)
+val call : string list -> unit t
+val call_exit_code : string list -> int t
+val call_exit_status : string list -> Exit_status.t t
 val call_bool
-  : ?true_v:int list
+  :  ?true_v:int list
   -> ?false_v:int list
-  -> ('a, unit, string, bool t) format4
-  -> 'a
+  -> string list
+  -> bool t
+
 
 module Background_command : sig
   type t
