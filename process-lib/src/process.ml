@@ -657,6 +657,22 @@ let run_bool ?(true_v=[0]) ?(false_v=[1]) prog args =
     Printf.ksprintf failwith "Command exited with unexpected code %d: %s"
       code (cmd_line prog args)
 
+let call_exit_status = function
+  | [] -> failwith "call_exit_status: empty command"
+  | prog::args -> run_exit_status prog args
+
+let call_exit_code = function
+  | [] -> failwith "call_exit_code: empty command"
+  | prog::args -> run_exit_code prog args
+
+let call = function
+  | [] -> failwith "call: empty command"
+  | prog::args -> run prog args
+
+let call_bool ?true_v ?false_v = function
+  | [] -> failwith "call_bool: empty command"
+  | prog::args -> run_bool ?true_v ?false_v prog args
+
 let find_executable =
   let prim =
     Prim.make "find-executable"

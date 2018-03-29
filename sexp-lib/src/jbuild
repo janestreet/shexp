@@ -2,7 +2,6 @@
  ((name shexp_sexp)
   (public_name shexp.sexp)
   ;; No deps outside of base!
-(flags (:standard -safe-string))
   (libraries (base))
   (preprocess no_preprocessing)))
 

@@ -3,7 +3,6 @@
   (public_name shexp.bigstring)
   (c_names (bigstring_stubs))
   ;; No deps outside of the compiler distribution!
-(flags (:standard -safe-string))
   (libraries (bigarray))
   (preprocess no_preprocessing)))
 
