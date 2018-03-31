@@ -2,7 +2,8 @@
  ((name shexp_process)
   (public_name shexp.process)
   ;; No deps outside of the compiler distribution!
-  (libraries (unix
+  (libraries (base
+              unix
               threads
               spawn
               shexp_sexp
