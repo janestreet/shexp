@@ -3,8 +3,8 @@
   (public_name shexp.bigstring-io)
   (c_names (bigstring_io_stubs))
   ;; No deps outside of the compiler distribution!
-(flags (:standard -safe-string))
   (libraries (shexp_bigstring unix))
   (preprocess no_preprocessing)))
+
 
 (jbuild_version 1)
