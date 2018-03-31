@@ -190,14 +190,13 @@ val run_bool
   -> string list
   -> bool t
 
-
 (** Same functions as the 'run' ones above, but take a string list instead. This
-   way, the first element and the others are treated in a homogeneous way. It
-   can ease prepending commands in specific circumstances, e.g.  
+    way, the first element and the others are treated in a homogeneous way. It
+    can ease prepending commands in specific circumstances, e.g.
     [if profile then call ("time" :: command) else call command]
 
     E.g. [call ["grep"; "-i"; pattern filename]] is equivalent to [run "grep"
-   ["-i"; pattern; filename]] *)
+    ["-i"; pattern; filename]] *)
 val call : string list -> unit t
 val call_exit_code : string list -> int t
 val call_exit_status : string list -> Exit_status.t t
@@ -206,7 +205,6 @@ val call_bool
   -> ?false_v:int list
   -> string list
   -> bool t
-
 
 module Background_command : sig
   type t

@@ -617,81 +617,62 @@ let wait =
   in
   fun bc -> pack1 prim bc
 
-(* [command_xxx] functions are only auxiliary functions to be used to create
-   [run_xxx] and [call_xxx] functions; [C.cmd] is the name of the function for
-   tracing purpose. *)
-module MakeCommands (C : sig val cmd : string end) = struct
-  (* This could be implemented in term of [spawn] followed by a [wait], but
-     doing it in one primitive improve traces. *)
-  let command_exit_status =
-    let prim =
-      Prim.make C.cmd
-        [ A sexp_of_string
-        ; A (sexp_of_list sexp_of_string)
-        ]
-        (F Exit_status.sexp_of_t)
-        (fun env prog args ->
-           match Env.spawn env ~prog ~args with
-             | Ok pid -> waitpid pid
-             | Error Command_not_found ->
-                 Printf.ksprintf failwith "%s: command not found"
-                   (quote_for_errors prog))
-    in
-    fun prog args -> pack2 prim prog args
+(* This could be implemented in term of [spawn] followed by a [wait], but doing it in one
+   primitive improve traces. *)
+let run_exit_status =
+  let prim =
+    Prim.make "run"
+      [ A sexp_of_string
+      ; A (sexp_of_list sexp_of_string)
+      ]
+      (F Exit_status.sexp_of_t)
+      (fun env prog args ->
+         match Env.spawn env ~prog ~args with
+         | Ok pid -> waitpid pid
+         | Error Command_not_found ->
+           Printf.ksprintf failwith "%s: command not found" (quote_for_errors prog))
+  in
+  fun prog args -> pack2 prim prog args
 
-  let command_exit_code prog args =
-    command_exit_status prog args >>| function
-    | Exited n -> n
-    | Signaled signal ->
-        Printf.ksprintf failwith "Command got signal %d: %s"
-          signal (cmd_line prog args)
+let run_exit_code prog args =
+  run_exit_status prog args >>| function
+  | Exited n -> n
+  | Signaled signal ->
+    Printf.ksprintf failwith "Command got signal %d: %s"
+      signal (cmd_line prog args)
 
-  let command prog args =
-    command_exit_code prog args >>| fun code ->
-    if code <> 0 then
-      Printf.ksprintf failwith "Command exited with code %d: %s"
-        code (cmd_line prog args)
+let run prog args =
+  run_exit_code prog args >>| fun code ->
+  if code <> 0 then
+    Printf.ksprintf failwith "Command exited with code %d: %s"
+      code (cmd_line prog args)
 
-  let command_bool ?(true_v=[0]) ?(false_v=[1]) prog args =
-    command_exit_code prog args >>| fun code ->
-    if List.mem code ~set:true_v then
-      true
-    else if List.mem code ~set:false_v then
-      false
-    else
-      Printf.ksprintf failwith "Command exited with unexpected code %d: %s"
-        code (cmd_line prog args)
-end
-
-module RunCommands = MakeCommands(struct let cmd = "run" end)
-
-let run_exit_status = RunCommands.command_exit_status
-    
-let run_exit_code = RunCommands.command_exit_code
-
-let run = RunCommands.command
-
-let run_bool = RunCommands.command_bool
-
-module CallCommands = MakeCommands(struct let cmd = "call" end)
+let run_bool ?(true_v=[0]) ?(false_v=[1]) prog args =
+  run_exit_code prog args >>| fun code ->
+  if List.mem code ~set:true_v then
+    true
+  else if List.mem code ~set:false_v then
+    false
+  else
+    Printf.ksprintf failwith "Command exited with unexpected code %d: %s"
+      code (cmd_line prog args)
 
 let call_exit_status = function
   | [] -> failwith "call_exit_status: empty command"
-  | prog::args -> CallCommands.command_exit_status prog args
-    
+  | prog::args -> run_exit_status prog args
+
 let call_exit_code = function
   | [] -> failwith "call_exit_code: empty command"
-  | prog::args -> CallCommands.command_exit_code prog args
+  | prog::args -> run_exit_code prog args
 
 let call = function
   | [] -> failwith "call: empty command"
-  | prog::args -> CallCommands.command prog args
+  | prog::args -> run prog args
 
 let call_bool ?true_v ?false_v = function
   | [] -> failwith "call_bool: empty command"
-  | prog::args -> CallCommands.command_bool ?true_v ?false_v prog args
-                     
-      
+  | prog::args -> run_bool ?true_v ?false_v prog args
+
 let find_executable =
   let prim =
     Prim.make "find-executable"
