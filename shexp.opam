@@ -11,11 +11,11 @@ build: [
 depends: [
   "base"
   "posixat"
-  "spawn"
   "base-threads"
   "jbuilder"     {build & >= "1.0+beta18.1"}
+  "spawn"
 ]
-available: [ ocaml-version >= "4.04.1" ]
+available: [ ocaml-version >= "4.06.1" ]
 descr: "
 Process library and s-expression based shell
 

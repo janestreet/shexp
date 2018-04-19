@@ -4,7 +4,7 @@ module List = struct
   let concat_map l ~f = map l ~f |> concat
 end
 
-include (StdLabels : module type of struct include StdLabels end with module List := List)
+include (StdLabels : module type of struct include StdLabels end with module List := StdLabels.List)
 include MoreLabels
 
 module SMap = struct
