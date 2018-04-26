@@ -12,7 +12,7 @@ build: [
 depends: [
   "base"         {>= "v0.11" & < "v0.12"}
   "posixat"      {>= "v0.11" & < "v0.12"}
-  "spawn"        {>= "v0.11" & < "v0.12"}
+  "spawn"        {>= "v0.12"}
   "base-threads"
   "jbuilder"     {build & >= "1.0+beta18.1"}
 ]

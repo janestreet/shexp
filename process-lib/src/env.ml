@@ -300,7 +300,7 @@ let spawn t ~prog ~args =
     in
     let pid =
       Spawn.spawn ()
-        ~env
+        ~env:(Spawn.Env.of_list env)
         ~cwd
         ~prog:real_prog
         ~argv:(prog :: args)
