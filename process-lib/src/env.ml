@@ -292,6 +292,7 @@ let spawn t ~prog ~args =
     let env =
       SMap.fold t.unix_env.entries ~init:[] ~f:(fun ~key ~data acc ->
         sprintf "%s=%s" key data :: acc)
+      |> Spawn.Env.of_list
     in
     let cwd : Spawn.Working_dir.t =
       match t.cwd.physical with

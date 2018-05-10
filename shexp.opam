@@ -13,7 +13,7 @@ depends: [
   "posixat"
   "base-threads"
   "jbuilder"     {build & >= "1.0+beta18.1"}
-  "spawn"
+  "spawn"        {>= "v0.12"}
 ]
 available: [ ocaml-version >= "4.06.1" ]
 descr: "
