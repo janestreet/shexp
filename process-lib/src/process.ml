@@ -856,7 +856,8 @@ let open_file =
     pack3 prim perm flags fn
 
 let redirect ios ?perm ~flags fn t =
-  open_file ?perm ~flags fn >>= fun fd ->
+  open_file ?perm ~flags:(List.map ~f:Posixat.Open_flag.of_unix_open_flag flags) fn
+  >>= fun fd ->
   protect ~finally:(close_fd fd) (set_ios ios fd t)
 
 let std_to ios ?append fn t =

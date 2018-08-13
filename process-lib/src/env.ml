@@ -342,9 +342,13 @@ let full_path2 t path1 path2 =
 let open_file t ?(perm=0) ~flags path =
   match full_path t path with
   | Path path ->
-    Unix.openfile path (O_CLOEXEC :: flags) perm
+    Unix.openfile
+      path
+      (O_CLOEXEC :: List.map ~f:Posixat.Open_flag.to_unix_open_flag_exn flags)
+      perm
   | In_dir (dir,  path) ->
-    Posixat.openat ~dir ~path ~flags:(O_CLOEXEC :: flags) ~perm
+    Posixat.openat ~dir ~path ~perm
+      ~flags:(O_CLOEXEC :: flags)
 
 let close_noerr t = try Unix.close t with _ -> ()
 
