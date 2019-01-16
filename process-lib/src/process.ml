@@ -546,7 +546,8 @@ end
 let quote_for_errors s =
   let need_quoting = ref false in
   String.iter s ~f:(function
-    | 'A'..'Z' | 'a'..'z' | '0'..'9' | '-' | '=' | '+' | '_' | '/' -> ()
+    | 'a'..'z' | 'A'..'Z' | '0'..'9'
+    | '_' | '-' | ':' | '.' | '/' | ',' | '+' | '=' | '%' | '@' -> ()
     | _ -> need_quoting := true);
   if !need_quoting then
     Filename.quote s

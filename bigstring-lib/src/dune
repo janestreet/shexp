@@ -1,0 +1,3 @@
+(library (name shexp_bigstring) (public_name shexp.bigstring)
+ (c_names bigstring_stubs) (libraries bigarray)
+ (preprocess no_preprocessing))

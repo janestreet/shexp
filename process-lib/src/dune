@@ -1,0 +1,4 @@
+(library (name shexp_process) (public_name shexp.process)
+ (libraries unix threads spawn shexp_sexp shexp_bigstring shexp_bigstring_io
+  posixat)
+ (preprocess no_preprocessing))
