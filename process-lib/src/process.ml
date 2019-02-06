@@ -545,6 +545,7 @@ end
 
 let quote_for_errors s =
   let need_quoting = ref false in
+  (match s with | "" -> need_quoting := true | _ -> ());
   String.iter s ~f:(function
     | 'a'..'z' | 'A'..'Z' | '0'..'9'
     | '_' | '-' | ':' | '.' | '/' | ',' | '+' | '=' | '%' | '@' -> ()
