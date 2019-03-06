@@ -195,7 +195,7 @@ val run_bool
     can ease prepending commands in specific circumstances, e.g.
     [if profile then call ("time" :: command) else call command]
 
-    E.g. [call ["grep"; "-i"; pattern filename]] is equivalent to [run "grep"
+    E.g. [call ["grep"; "-i"; pattern; filename]] is equivalent to [run "grep"
     ["-i"; pattern; filename]] *)
 val call : string list -> unit t
 val call_exit_code : string list -> int t
