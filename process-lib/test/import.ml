@@ -1,4 +1,5 @@
 open Core
+open Poly
 module Process = Shexp_process
 
 module P = Process
