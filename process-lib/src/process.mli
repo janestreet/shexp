@@ -127,7 +127,7 @@ val map : 'a t -> f:('a -> 'b) -> 'b t
     raise this exception. *)
 val fail : exn -> _ t
 
-(** [fork a b] reprensents two processes that are executed concurrently. The resulting
+(** [fork a b] represents two processes that are executed concurrently. The resulting
     process will block until both [a] and [b] have finished and will return both of their
     results.
 
