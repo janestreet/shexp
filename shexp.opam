@@ -14,7 +14,7 @@ depends: [
   "base"
   "posixat"
   "base-threads"
-  "dune"         {>= "1.5.1"}
+  "dune"         {>= "2.0.0"}
   "spawn"        {>= "v0.12"}
 ]
 synopsis: "Process library and s-expression based shell"
