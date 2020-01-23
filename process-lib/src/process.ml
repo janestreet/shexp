@@ -522,12 +522,17 @@ let bind t ~f = Bind (t, f)
 let map t ~f = Bind (t, fun x -> Return (f x))
 let fork a b = Fork (a, b)
 let fork_unit a b = map (fork a b) ~f:(fun (x, ()) -> x)
+let fork_all ts =
+  List.fold_right ts ~init:(return []) ~f:(fun hd tl ->
+    fork hd tl |> map ~f:(fun (a, b) -> a :: b))
+let fork_all_unit ts = List.fold_right ts ~init:(return ()) ~f:fork_unit
 let protect ~finally t = Protect { finally; t }
 let reify_exn f x =
   match f x with
   | t -> t
   | exception exn -> Error { exn; backtrace = Printexc.get_raw_backtrace () }
 let fail exn = Error { exn; backtrace = Printexc.get_raw_backtrace () }
+
 
 module Infix0 = struct
   let ( >>= ) t f = bind t ~f

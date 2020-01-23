@@ -127,7 +127,7 @@ val map : 'a t -> f:('a -> 'b) -> 'b t
     raise this exception. *)
 val fail : exn -> _ t
 
-(** [fork a b] reprensents two processes that are executed concurrently. The resulting
+(** [fork a b] represents two processes that are executed concurrently. The resulting
     process will block until both [a] and [b] have finished and will return both of their
     results.
 
@@ -142,6 +142,13 @@ val fork : 'a t -> 'b t -> ('a * 'b) t
 
 (** Same as [map (fork a b) ~f:(fun (x, ()) -> x)] *)
 val fork_unit : 'a t -> unit t -> 'a t
+
+(** [fork_all ps] represents [List.length ps] processes executed concurrently. [fork_all]
+    generalizes [fork] from pairs of elements to lists of elements. *)
+val fork_all : 'a t list -> 'a list t
+
+(** A slightly more efficient version of [map (fork_all ps) ~f:(fun _ -> ())] *)
+val fork_all_unit : unit t list -> unit t
 
 (** [protect ~finally t] protects against execution errors. [finally] is always executed,
     even if the evaluation of [t] raises. *)

@@ -27,6 +27,48 @@ let%expect_test "fork blocking" =
   print_s [%sexp (x : string * string)];
   [%expect {| (a b) |}]
 
+let%expect_test "fork_all" =
+  let x = eval_exn (P.fork_all [P.return "a"; P.return "b"; P.return "c"]) in
+  print_s [%sexp (x : string list)];
+  [%expect {| (a b c) |}]
+
+let%expect_test "fork_all blocking" =
+  let open P.Let_syntax in
+  let send ~result ~value ~to_ =
+    let%map () = P.sync (Event.send to_ value) in
+    result
+  in
+  let recv ~from = P.sync (Event.receive from) in
+  let recv_send ~from ~value ~to_ =
+    let%bind result = recv ~from in
+    send ~result ~value ~to_
+  in
+  let process =
+    let%bind p1 = P.new_channel in
+    let%bind p2 = P.new_channel in
+    let%bind p3 = P.new_channel in
+    P.fork_all
+      [ recv_send ~from:p1  ~value:0 ~to_:p3
+      ; send      ~result:1 ~value:2 ~to_:p2
+      ; recv_send ~from:p2  ~value:3 ~to_:p1
+      ; recv      ~from:p3
+      ]
+  in
+  let x = eval_exn process in
+  print_s [%sexp (x : int list)];
+  [%expect {| (3 1 2 0) |}]
+
+let%expect_test "fork_unit" =
+  let open P.Let_syntax in
+  let process =
+    let%bind ch = P.new_channel in
+    P.fork_all_unit
+      [ P.sync (Event.send ch ())
+      ; P.sync (Event.receive ch)
+      ]
+  in
+  eval_exn process
+
 let%expect_test "pipe" =
   eval_exn (P.echo "Hello, world!" |- P.run "tr" ["e"; "a"]);
   [%expect {| Hallo, world! |}]
@@ -78,4 +120,3 @@ let%expect_test "rm_rf deletes everything" =
       tmp dir contents:
       - .
  |}]
-
