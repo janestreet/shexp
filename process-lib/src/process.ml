@@ -645,8 +645,8 @@ let run_exit_code prog args =
   run_exit_status prog args >>| function
   | Exited n -> n
   | Signaled signal ->
-    Printf.ksprintf failwith "Command got signal %d: %s"
-      signal (cmd_line prog args)
+    Printf.ksprintf failwith "Command got signal %s: %s"
+      (Signal.name signal) (cmd_line prog args)
 
 let run prog args =
   run_exit_code prog args >>| fun code ->
