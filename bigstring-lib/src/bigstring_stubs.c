@@ -17,7 +17,7 @@ CAMLprim value shexp_bigstring_blit_stub(
 {
   char *src = get_buf(v_src, v_src_pos);
   char *dst = get_buf(v_dst, v_dst_pos);
-  memcpy(dst, src, (size_t) Long_val(v_len));
+  memmove(dst, src, (size_t) Long_val(v_len));
   return Val_unit;
 }
 
@@ -26,7 +26,7 @@ CAMLprim value shexp_bigstring_blit_string_bigstring_stub(
 {
   const char *str = String_val(v_src) + Long_val(v_src_pos);
   char *buf = get_buf(v_buf, v_dst_pos);
-  memcpy(buf, str, (size_t) Long_val(v_len));
+  memmove(buf, str, (size_t) Long_val(v_len));
   return Val_unit;
 }
 
@@ -35,7 +35,7 @@ CAMLprim value shexp_bigstring_blit_bigstring_bytes_stub(
 {
   char *buf = get_buf(v_buf, v_src_pos);
   unsigned char *str = Bytes_val(v_dst) + Long_val(v_dst_pos);
-  memcpy(str, buf, (size_t) Long_val(v_len));
+  memmove(str, buf, (size_t) Long_val(v_len));
   return Val_unit;
 }
 

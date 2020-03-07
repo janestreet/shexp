@@ -136,7 +136,9 @@ let fold_gen fd ~sep ~init ~f =
           let acc = f acc chunk in
           loop acc ~start:(end_of_chunk + 1) ~pos:(end_of_chunk + 1) ~stop
       in
-      loop acc ~start:0 ~pos ~stop:(pos + n))
+      loop acc ~start:0 ~pos ~stop:(pos + n)
+    | exception Unix.Unix_error (EINTR, _, _) ->
+      Continue { state = (pos, acc) })
 
 let fold_lines fd       ~init ~f = fold_gen fd ~sep:End_of_line ~init ~f
 let fold_chunks fd ~sep ~init ~f = fold_gen fd ~sep:(Char sep)  ~init ~f
