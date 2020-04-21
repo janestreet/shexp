@@ -1,5 +1,5 @@
 open! Core
-open! Expect_test_helpers_kernel
+open! Expect_test_helpers_core
 
 module B = Shexp_bigstring_io.Std.Bigstring
 
