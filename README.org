@@ -45,7 +45,7 @@ val pipe_both : 'a t -> 'b t -> ('a * 'b) t
 (** Read all of the process' standard input  *)
 val read_all : string t
 
-(** [chdir dir k] exexutes [k] with the current directory set to [dir] *)
+(** [chdir dir k] executes [k] with the current directory set to [dir] *)
 val chdir : string -> 'a t -> 'a t
 #+end_src
 
