@@ -1,18 +1,18 @@
 (** Bigstring IO helpers *)
 
-include module type of struct include Shexp_bigstring.Std.Bigstring end
+include module type of struct
+  include Shexp_bigstring.Std.Bigstring
+end
 
 val write : Unix.file_descr -> t -> pos:int -> len:int -> int
-val read  : Unix.file_descr -> t -> pos:int -> len:int -> int
-
+val read : Unix.file_descr -> t -> pos:int -> len:int -> int
 val read_all : Unix.file_descr -> string
 val write_all : Unix.file_descr -> string -> unit
-
 val read_exactly : Unix.file_descr -> int -> string
 
 type read_all_interruptible_result =
   { interrupted : bool
-  ; collected   : string
+  ; collected : string
   }
 
 (** Same as [read_all] except that [stop] is called every [delay] seconds until it returns

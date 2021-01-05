@@ -3,7 +3,7 @@
 open Shexp_sexp.Std
 
 type t =
-  | Exited   of int
+  | Exited of int
   | Signaled of int
 
 val sexp_of_t : t -> Sexp.t

@@ -1,6 +1,5 @@
 module type S = sig
   type t
-
   type ('a, 'b) prim_token
 
   (** Called before the execution of a primitive. The S-expression is a representation of
@@ -30,6 +29,7 @@ module type S = sig
   (** Shexp tries to linearize the trace as much as possible. When an execution parameter
       is changed locally, such as in [(chdir ...) >>= ...], a sub context is entered. *)
   val enter_sub : t -> unit
+
   val leave_sub : t -> unit
 
   (** Force the use of threads in all forks, even when [Shexp_process] detect they are not

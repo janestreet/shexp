@@ -1,21 +1,21 @@
-open! Core
+open Core
 open! Expect_test_helpers_core
-
 open Import
 
 let%expect_test _ =
-  let log sexp =
-    Printf.printf !"%{sexp:Sexp.t}\n%!" (cleanup_sexp sexp)
-  in
-  Process.Logged.eval ~context ~log
-    (P.with_temp_dir ~prefix:"shexp-debugging" ~suffix:tmpdir_suffix
-       (fun tmpdir ->
-          P.chdir tmpdir
-            (P.stdout_to "blah" (P.echo "Bonjour les amis")
-             >> P.run "cat" ["blah"]
-             >> P.run "sed" ["s/o/a/g"; "blah"]
-             >> P.echo "C'est finit!")));
-  [%expect {|
+  let log sexp = Printf.printf !"%{sexp:Sexp.t}\n%!" (cleanup_sexp sexp) in
+  Process.Logged.eval
+    ~context
+    ~log
+    (P.with_temp_dir ~prefix:"shexp-debugging" ~suffix:tmpdir_suffix (fun tmpdir ->
+       P.chdir
+         tmpdir
+         (P.stdout_to "blah" (P.echo "Bonjour les amis")
+          >> P.run "cat" [ "blah" ]
+          >> P.run "sed" [ "s/o/a/g"; "blah" ]
+          >> P.echo "C'est finit!")));
+  [%expect
+    {|
     ((thread 0) (id 0)
      (generate-temporary-directory (prefix shexp-debugging) (suffix <temp-dir>)))
     ((thread 0) (id 0) -> <temp-dir>)
@@ -48,3 +48,4 @@ let%expect_test _ =
     ((thread 0) (id 12) (rmdir <temp-dir>))
     ((thread 0) (id 12) -> ())
   |}]
+;;

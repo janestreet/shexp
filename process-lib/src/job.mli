@@ -3,4 +3,4 @@
 type 'a t
 
 val detach : f:(unit -> 'a) -> 'a t
-val wait   : 'a t -> 'a
+val wait : 'a t -> 'a

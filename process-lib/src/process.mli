@@ -24,9 +24,10 @@ module Context : sig
     type t =
       | Inherit
       | Path of string
-      | Physical of { path : string
-                    ; fd   : Unix.file_descr
-                    }
+      | Physical of
+          { path : string
+          ; fd : Unix.file_descr
+          }
   end
 
   (** Creates a new execution context. Non-specified fields are captured from the
@@ -105,7 +106,7 @@ end
     are essentially two non-interactive debuggers. *)
 module type Debugger = Debugger_intf.S
 
-module With_debug(Dbg : Debugger) : sig
+module With_debug (Dbg : Debugger) : sig
   val eval
     :  ?context:Context.t
     -> ?capture:bool (** default: false *)
@@ -120,6 +121,7 @@ end
     you should be careful about using global mutable data structures. To communicate
     values between concurrent processes, use the [sync] function. *)
 val return : 'a -> 'a t
+
 val bind : 'a t -> f:('a -> 'b t) -> 'b t
 val map : 'a t -> f:('a -> 'b) -> 'b t
 
@@ -162,7 +164,7 @@ val protect : finally:unit t -> 'a t -> 'a t
     {[
       let f () = raise Not_found
 
-      protect ~finally (f ())
+                   protect ~finally (f ())
     ]}
 
     You can write instead:
@@ -205,18 +207,15 @@ val run_bool
     E.g. [call ["grep"; "-i"; pattern; filename]] is equivalent to [run "grep"
     ["-i"; pattern; filename]] *)
 val call : string list -> unit t
+
 val call_exit_code : string list -> int t
 val call_exit_status : string list -> Exit_status.t t
-val call_bool
-  :  ?true_v:int list
-  -> ?false_v:int list
-  -> string list
-  -> bool t
+val call_bool : ?true_v:int list -> ?false_v:int list -> string list -> bool t
 
 module Background_command : sig
   type t
 
-  val pid  : t -> int
+  val pid : t -> int
 end
 
 (** Start an external program but do not wait for its termination. If you never call
@@ -230,10 +229,12 @@ val wait : Background_command.t -> Exit_status.t t
 
 (** Return the absolute path to the given command. *)
 val find_executable : string -> string option t
+
 val find_executable_exn : string -> string t
 
 (** Return the value associated to the given environment variable. *)
 val get_env : string -> string option t
+
 val get_env_exn : string -> string t
 
 (** [set_env var value k] represents the process [k] evaluated in a context where the
@@ -294,14 +295,15 @@ val iter_chunks : sep:char -> (string -> unit t) -> unit t
 
     [(aio, bio)] defaults to [([Stdout], Stdin)].
 *)
-val pipe : ?connect:(Std_io.t list * Std_io.t) -> unit t -> 'a t -> 'a t
+val pipe : ?connect:Std_io.t list * Std_io.t -> unit t -> 'a t -> 'a t
 
 (** [pipe_pair a b] is a the same as [pipe] but returns the results of both [a] and
     [b]. *)
-val pipe_both : ?connect:(Std_io.t list * Std_io.t) ->  'a t -> 'b t -> ('a * 'b) t
+val pipe_both : ?connect:Std_io.t list * Std_io.t -> 'a t -> 'b t -> ('a * 'b) t
 
 (** Same as [pipe ~connect:([Stderr], Stdin)]. *)
 val epipe : unit t -> 'a t -> 'a t
+
 val epipe_both : 'a t -> 'b t -> ('a * 'b) t
 
 (** [capture ios t = pipe_both ~connect:(ios, Stdin) read_all] *)
@@ -324,18 +326,14 @@ val redirect
 
 (** Convenient wrappers for [redirect] *)
 val stdout_to : ?append:unit -> string -> 'a t -> 'a t
+
 val stderr_to : ?append:unit -> string -> 'a t -> 'a t
 val outputs_to : ?append:unit -> string -> 'a t -> 'a t
 val stdin_from : string -> 'a t -> 'a t
 
 (** Replace the given standard io by the given one. For instance to redirect stdout to
     stderr: [replace_io ~stdout:Stderr t] *)
-val replace_io
-  :  ?stdin:Std_io.t
-  -> ?stdout:Std_io.t
-  -> ?stderr:Std_io.t
-  -> 'a t
-  -> 'a t
+val replace_io : ?stdin:Std_io.t -> ?stdout:Std_io.t -> ?stderr:Std_io.t -> 'a t -> 'a t
 
 (** [out_to_err t = replace_io ~stdout:Stderr t] *)
 val out_to_err : 'a t -> 'a t
@@ -365,19 +363,19 @@ val with_temp_dir : prefix:string -> suffix:string -> (string -> 'a t) -> 'a t
 
 (** {1 FS operations} *)
 
-val chmod       : string -> perm:Unix.file_perm -> unit t
-val chown       : string -> uid:int -> gid:int -> unit t
-val mkdir       : ?perm:Unix.file_perm -> ?p:unit -> string -> unit t
-val rm          : string -> unit t
-val rmdir       : string -> unit t
-val mkfifo      : ?perm:Unix.file_perm -> string -> unit t
-val link        : string -> string -> unit t
-val rename      : string -> string -> unit t
-val symlink     : string -> string -> unit t
-val stat        : string -> Unix.LargeFile.stats t
-val lstat       : string -> Unix.LargeFile.stats t
-val readlink    : string -> string t
-val readdir     : string -> string list t
+val chmod : string -> perm:Unix.file_perm -> unit t
+val chown : string -> uid:int -> gid:int -> unit t
+val mkdir : ?perm:Unix.file_perm -> ?p:unit -> string -> unit t
+val rm : string -> unit t
+val rmdir : string -> unit t
+val mkfifo : ?perm:Unix.file_perm -> string -> unit t
+val link : string -> string -> unit t
+val rename : string -> string -> unit t
+val symlink : string -> string -> unit t
+val stat : string -> Unix.LargeFile.stats t
+val lstat : string -> Unix.LargeFile.stats t
+val readlink : string -> string t
+val readdir : string -> string list t
 val file_exists : string -> bool t
 
 (** Recursively remove a tree *)
@@ -414,12 +412,13 @@ end
 (** Open this module when using [ppx_let] *)
 module Let_syntax : sig
   val return : 'a -> 'a t
-  include (module type of Infix)
+
+  include module type of Infix
 
   module Let_syntax : sig
     val return : 'a -> 'a t
     val bind : 'a t -> f:('a -> 'b t) -> 'b t
-    val map  : 'a t -> f:('a -> 'b) -> 'b t
+    val map : 'a t -> f:('a -> 'b) -> 'b t
 
     (** Same as [fork] *)
     val both : 'a t -> 'b t -> ('a * 'b) t

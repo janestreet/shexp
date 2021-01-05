@@ -1,6 +1,5 @@
-open! Core
-open! Expect_test_helpers_core
-
+open Core
+open Expect_test_helpers_core
 module B = Shexp_bigstring.Std.Bigstring
 
 let%expect_test _ =
@@ -10,7 +9,8 @@ let%expect_test _ =
       if n = 26 then '\n' else Char.of_int_exn (n + Char.to_int 'a'))
   in
   print_string input;
-  [%expect{|
+  [%expect
+    {|
     abcdefghijklmnopqrstuvwxyz
     abcdefghijklmnopqrstuvwxyz
     abcdefghijklmnopqrstuvwxyz
@@ -19,10 +19,7 @@ let%expect_test _ =
   let line =
     B.fold_temporary ~size:1 ~init:0 ~f:(fun buf pos ->
       let to_copy = min (B.length buf - pos) (String.length input) in
-      B.blit_string_t
-        ~src:input ~src_pos:pos
-        ~dst:buf   ~dst_pos:pos
-        ~len:to_copy;
+      B.blit_string_t ~src:input ~src_pos:pos ~dst:buf ~dst_pos:pos ~len:to_copy;
       match B.index buf ~pos ~len:to_copy ~char:'\n' with
       | None -> Resize { new_size = B.length buf * 2; state = pos + to_copy }
       | Some i -> Return (B.sub_string buf ~pos:0 ~len:i))
@@ -31,5 +28,4 @@ let%expect_test _ =
   [%expect {|
     abcdefghijklmnopqrstuvwxyz
   |}]
-
-
+;;

@@ -5,36 +5,12 @@ open Bigarray
 type t = (char, int8_unsigned_elt, c_layout) Array1.t
 
 val create : int -> t
-
 val length : t -> int
-
-val blit
-  :  src:t
-  -> src_pos:int
-  -> dst:t
-  -> dst_pos:int
-  -> len:int
-  -> unit
-
-val blit_string_t
-  :  src:string
-  -> src_pos:int
-  -> dst:t
-  -> dst_pos:int
-  -> len:int
-  -> unit
-
-val blit_t_bytes
-  :  src:t
-  -> src_pos:int
-  -> dst:Bytes.t
-  -> dst_pos:int
-  -> len:int
-  -> unit
-
+val blit : src:t -> src_pos:int -> dst:t -> dst_pos:int -> len:int -> unit
+val blit_string_t : src:string -> src_pos:int -> dst:t -> dst_pos:int -> len:int -> unit
+val blit_t_bytes : src:t -> src_pos:int -> dst:Bytes.t -> dst_pos:int -> len:int -> unit
 val sub_string : t -> pos:int -> len:int -> string
-
-val index  : t -> pos:int -> len:int -> char:char -> int option
+val index : t -> pos:int -> len:int -> char:char -> int option
 val rindex : t -> pos:int -> len:int -> char:char -> int option
 
 (** Efficiently checks that the range denoted by [(pos, len)] is in the range
@@ -54,7 +30,10 @@ val check_pos_len_exn : pos:int -> len:int -> length:int -> unit
 val with_temporary : size:int -> f:(t -> 'a) -> 'a
 
 type ('a, 'b) fold_temporary_result =
-  | Resize   of { new_size : int; state : 'a }
+  | Resize of
+      { new_size : int
+      ; state : 'a
+      }
   | Continue of { state : 'a } (** Same as [Resize] with the same size *)
   | Return of 'b
 
@@ -67,5 +46,5 @@ type ('a, 'b) fold_temporary_result =
 val fold_temporary
   :  size:int
   -> init:'a
-  -> f:(t -> 'a -> ('a, 'b)  fold_temporary_result)
+  -> f:(t -> 'a -> ('a, 'b) fold_temporary_result)
   -> 'b

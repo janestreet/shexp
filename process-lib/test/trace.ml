@@ -1,33 +1,34 @@
-open! Core
-open! Expect_test_helpers_core
-
+open Core
+open Expect_test_helpers_core
 open Import
 
 let trace process =
   let _res, trace =
-    without_backtrace (fun () ->
-      Process.Traced.eval ~context ~capture:true process)
+    without_backtrace (fun () -> Process.Traced.eval ~context ~capture:true process)
   in
   print_s (cleanup_sexp trace)
+;;
 
 let%expect_test _ =
   trace (P.echo "Hello, world!");
   [%expect {|
     ((echo "Hello, world!") "Hello, world!\n")
   |}]
+;;
 
 let%expect_test _ =
   trace
-    (P.with_temp_dir ~prefix:"shexp-debugging" ~suffix:tmpdir_suffix
-       (fun tmpdir ->
-          P.chdir tmpdir
-            (P.stdout_to "blah" (P.echo "Bonjour les amis")
-             >> P.run "cat" ["blah"]
-             >> (P.run "cat" ["blah"]
-                 |- P.run "sed" ["s/o/a/g"]
-                 |- P.run "sed" ["s/ /\\n/g"])
-             >> P.echo "C'est finit!")));
-  [%expect {|
+    (P.with_temp_dir ~prefix:"shexp-debugging" ~suffix:tmpdir_suffix (fun tmpdir ->
+       P.chdir
+         tmpdir
+         (P.stdout_to "blah" (P.echo "Bonjour les amis")
+          >> P.run "cat" [ "blah" ]
+          >> (P.run "cat" [ "blah" ]
+              |- P.run "sed" [ "s/o/a/g" ]
+              |- P.run "sed" [ "s/ /\\n/g" ])
+          >> P.echo "C'est finit!")));
+  [%expect
+    {|
     ((generate-temporary-directory
        (prefix shexp-debugging)
        (suffix <temp-dir>))
@@ -69,16 +70,15 @@ let%expect_test _ =
      (rm    <temp-dir>/blah)
      (rmdir <temp-dir>))
   |}]
+;;
 
 let%expect_test "multiple errors" =
   trace
-    (P.unset_env "A"
-       (P.unset_env "B"
-          (P.fork
-             (P.get_env_exn "A")
-             (P.get_env_exn "B")
-           >>| ignore)));
-  [%expect {|
+    (P.unset_env
+       "A"
+       (P.unset_env "B" (P.fork (P.get_env_exn "A") (P.get_env_exn "B") >>| ignore)));
+  [%expect
+    {|
     ((unset-env A)
      (unset-env B)
      (fork
@@ -88,10 +88,12 @@ let%expect_test "multiple errors" =
        ((get-env B)
         (-> ())
         (user-exn (Failure "environment variable \"B\" not found"))))) |}]
+;;
 
 let%expect_test "rename current directory" =
   trace rename_current_directory;
-  [%expect {|
+  [%expect
+    {|
     ((generate-temporary-directory
        (prefix shexp_process_test)
        (suffix <temp-dir>))
@@ -243,3 +245,4 @@ let%expect_test "rename current directory" =
      (rmdir <temp-dir>/blah-new)
      (rmdir <temp-dir>))
   |}]
+;;

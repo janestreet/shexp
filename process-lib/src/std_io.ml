@@ -6,7 +6,9 @@ type t =
   | Stderr
 
 let sexp_of_t t =
-  Sexp.Atom (match t with
-    | Stdin  -> "stdin"
-    | Stdout -> "stdout"
-    | Stderr -> "stderr")
+  Sexp.Atom
+    (match t with
+     | Stdin -> "stdin"
+     | Stdout -> "stdout"
+     | Stderr -> "stderr")
+;;
