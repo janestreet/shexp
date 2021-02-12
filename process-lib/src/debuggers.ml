@@ -87,7 +87,8 @@ module Logger = struct
     in
     t.out
       Sexp.(
-        List (List [ Atom "thread"; int t.thread_id ] :: List [ Atom "id"; int id ] :: res))
+        List
+          (List [ Atom "thread"; int t.thread_id ] :: List [ Atom "id"; int id ] :: res))
   ;;
 
   let user_exn t e bt =
