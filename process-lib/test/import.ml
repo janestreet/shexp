@@ -1,4 +1,5 @@
 open Core
+module Unix = Core_unix
 module Process = Shexp_process
 module P = Process
 include P.Infix

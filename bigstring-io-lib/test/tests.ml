@@ -1,9 +1,10 @@
 open Core
 open Expect_test_helpers_core
+module Unix = Core_unix
 module B = Shexp_bigstring_io.Std.Bigstring
 
 let%expect_test _ =
-  protectx (Filename.temp_file "test" "") ~finally:Sys.remove ~f:(fun fn ->
+  protectx (Filename_unix.temp_file "test" "") ~finally:Sys.remove ~f:(fun fn ->
     let s =
       String.init 100 ~f:(fun i ->
         let n = i mod 27 in
