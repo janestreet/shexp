@@ -35,7 +35,7 @@ external unsafe_blit_t_bytes
   = "shexp_bigstring_blit_bigstring_bytes_stub"
 [@@noalloc]
 
-(* See comment in Core_kernel.Ordered_set_lang to convince yourself that it is safe *)
+(* See comment in Core.Ordered_set_lang to convince yourself that it is safe *)
 let pos_len_ok ~pos ~len ~length =
   let stop = pos + len in
   pos lor len lor stop lor (length - stop) >= 0

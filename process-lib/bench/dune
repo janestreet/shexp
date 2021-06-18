@@ -1,2 +1,2 @@
-(library (name shexp_process_bench) (libraries core shexp_process)
- (preprocess (pps ppx_jane)))
+(library (name shexp_process_bench)
+ (libraries core_kernel.core shexp_process) (preprocess (pps ppx_jane)))

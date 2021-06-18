@@ -7,7 +7,7 @@ include P.Infix
 (* Close all fds >= 3. Must be called before creating the context. *)
 let () =
   let get_fds () =
-    Sys.readdir "/proc/self/fd"
+    Sys_unix.readdir "/proc/self/fd"
     |> Array.to_list
     |> List.map ~f:int_of_string
     |> List.sort ~compare:Int.compare
