@@ -1,6 +1,6 @@
 open StdLabels
 
-type t = Base.Exported_for_specific_uses.Sexplib.Sexp.t =
+type t = Sexplib0.Sexp.t =
   | Atom of string
   | List of t list
 
@@ -59,8 +59,5 @@ let rec to_string = function
   | List l -> sprintf "(%s)" (List.map l ~f:to_string |> String.concat ~sep:" ")
 ;;
 
-let register_exn_converter a b =
-  Base.Exported_for_specific_uses.Sexplib.Conv.Exn_converter.add a b
-;;
-
-let exn = Base.Exported_for_specific_uses.Sexplib.Conv.sexp_of_exn
+let register_exn_converter a b = Sexplib0.Sexp_conv.Exn_converter.add a b
+let exn = Sexplib0.Sexp_conv.sexp_of_exn

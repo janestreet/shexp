@@ -11,8 +11,8 @@ build: [
 ]
 depends: [
   "ocaml" {>= "4.08.0"}
-  "base"
   "posixat"
+  "sexplib0"
   "base-threads"
   "dune"         {>= "2.0.0"}
   "spawn"        {>= "v0.12"}

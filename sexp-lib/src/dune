@@ -1,2 +1,2 @@
-(library (name shexp_sexp) (public_name shexp.sexp) (libraries base)
+(library (name shexp_sexp) (public_name shexp.sexp) (libraries sexplib0)
  (preprocess no_preprocessing))

@@ -1,6 +1,6 @@
 (** Mini S-expression library *)
 
-type t = Base.Exported_for_specific_uses.Sexplib.Sexp.t =
+type t = Sexplib0.Sexp.t =
   | Atom of string
   | List of t list
 
