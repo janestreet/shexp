@@ -18,7 +18,7 @@ struct
   ;;
 end
 
-module B1 = Dbg (struct
+module _ = Dbg (struct
     let name = "many >>="
 
     let process =
@@ -35,7 +35,7 @@ module B1 = Dbg (struct
     ;;
   end)
 
-module B2 = Dbg (struct
+module _ = Dbg (struct
     let name = "many set-env"
 
     let process =
@@ -44,7 +44,7 @@ module B2 = Dbg (struct
     ;;
   end)
 
-module B3 = Dbg (struct
+module _ = Dbg (struct
     let name = "many bind+set-env dyn"
 
     let process =
@@ -73,7 +73,7 @@ let list_jbuilds =
 
 let () = Process.eval ~context list_jbuilds
 
-module B4 = Dbg (struct
+module _ = Dbg (struct
     let name = "list jbuilds"
     let process = list_jbuilds
   end)
