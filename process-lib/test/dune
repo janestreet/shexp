@@ -1,4 +1,4 @@
 (library (name shexp_process_test)
- (libraries shexp_process core_kernel.core core.core_unix
-  expect_test_helpers_core core.sys_unix)
+ (libraries shexp_process core core_unix expect_test_helpers_core
+  core_unix.sys_unix)
  (preprocess (pps ppx_jane)))
