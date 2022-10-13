@@ -87,7 +87,18 @@ let%expect_test "stdout_to /dev/null" =
 let%expect_test "capture" =
   let x = eval_exn (P.capture_unit [ Stdout ] (P.run "echo" [ "Hello, world!" ])) in
   print_s [%sexp (x : string)];
-  [%expect {| "Hello, world!\n" |}]
+  [%expect {| "Hello, world!\n" |}];
+  let stdout, stderr =
+    P.print "stdout contents"
+    >> P.eprint "stderr contents"
+    |> P.capture_unit [ Stdout ]
+    |> P.capture [ Stderr ]
+    |> eval_exn
+  in
+  print_s [%sexp { stdout : string; stderr : string }];
+  [%expect {|
+    ((stdout "stdout contents")
+     (stderr "stderr contents")) |}]
 ;;
 
 let%expect_test "unix environment" =
