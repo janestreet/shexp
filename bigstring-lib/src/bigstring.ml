@@ -41,7 +41,7 @@ let pos_len_ok ~pos ~len ~length =
   pos lor len lor stop lor (length - stop) >= 0
 ;;
 
-let[@inlined never] out_of_range ~pos ~len ~length =
+let[@inline never] out_of_range ~pos ~len ~length =
   Printf.ksprintf
     failwith
     "Shexp_bigstring got invalid range (pos=%d, len=%d, length=%d)"
