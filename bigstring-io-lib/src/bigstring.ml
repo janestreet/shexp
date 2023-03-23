@@ -107,8 +107,7 @@ type separator =
 let fold_gen fd ~sep ~init ~f =
   fold_temporary ~size:4096 ~init:(0, init) ~f:(fun buf (pos, acc) ->
     match read fd buf ~pos ~len:(length buf - pos) with
-    | 0 ->
-      if pos = 0 then Return acc else Return (f acc (sub_string buf ~pos:0 ~len:pos))
+    | 0 -> if pos = 0 then Return acc else Return (f acc (sub_string buf ~pos:0 ~len:pos))
     | n ->
       let rec loop acc ~start ~pos ~stop : (_, _) fold_temporary_result =
         let char =
