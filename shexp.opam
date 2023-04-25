@@ -1,4 +1,5 @@
 opam-version: "2.0"
+version: "v0.16.0"
 maintainer: "Jane Street developers"
 authors: ["Jane Street Group, LLC"]
 homepage: "https://github.com/janestreet/shexp"
@@ -10,9 +11,9 @@ build: [
   ["dune" "build" "-p" name "-j" jobs]
 ]
 depends: [
-  "ocaml" {>= "4.14.0"}
-  "posixat"
-  "sexplib0"
+  "ocaml"        {>= "4.14.0"}
+  "posixat"      {>= "v0.16" & < "v0.17"}
+  "sexplib0"     {>= "v0.16" & < "v0.17"}
   "base-threads"
   "dune"         {>= "2.0.0"}
   "spawn"        {>= "v0.15"}
