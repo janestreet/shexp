@@ -374,112 +374,112 @@ module With_debug (D : Debugger) = struct
 
   let rec exec : type a. Env.t -> D.t -> can_deref_cwd:bool -> a t -> a =
     fun env dbg ~can_deref_cwd t ->
-      match t with
-      | Return x ->
-        deref_cwd env ~can_deref_cwd;
-        x
-      | Error { exn; backtrace } ->
-        deref_cwd env ~can_deref_cwd;
-        D.user_exn dbg exn backtrace;
-        raise exn
-      | Env_get { prim; args } ->
-        deref_cwd env ~can_deref_cwd;
-        let token = D.before_prim dbg prim args in
-        let res = Prim.run prim env args in
-        D.after_prim dbg prim (Ok res) token;
-        res
-      | Env_set { prim; args; k } ->
-        D.need_checkpoint dbg;
-        let token = D.before_prim dbg prim args in
-        let env = Prim.run prim env args in
-        D.after_prim dbg prim (Ok env) token;
-        exec env dbg k ~can_deref_cwd
-      | Prim { prim; args } ->
-        let token = D.before_prim dbg prim args in
-        let res = to_result (fun () -> Prim.run prim env args) in
-        deref_cwd env ~can_deref_cwd;
-        D.capture dbg;
-        D.after_prim dbg prim res token;
-        ok_exn res
-      | Bind (t, f) ->
-        (match exec_sub env dbg t with
-         | exception exn ->
-           deref_cwd env ~can_deref_cwd;
-           reraise exn
-         | x ->
-           (match f x with
+    match t with
+    | Return x ->
+      deref_cwd env ~can_deref_cwd;
+      x
+    | Error { exn; backtrace } ->
+      deref_cwd env ~can_deref_cwd;
+      D.user_exn dbg exn backtrace;
+      raise exn
+    | Env_get { prim; args } ->
+      deref_cwd env ~can_deref_cwd;
+      let token = D.before_prim dbg prim args in
+      let res = Prim.run prim env args in
+      D.after_prim dbg prim (Ok res) token;
+      res
+    | Env_set { prim; args; k } ->
+      D.need_checkpoint dbg;
+      let token = D.before_prim dbg prim args in
+      let env = Prim.run prim env args in
+      D.after_prim dbg prim (Ok env) token;
+      exec env dbg k ~can_deref_cwd
+    | Prim { prim; args } ->
+      let token = D.before_prim dbg prim args in
+      let res = to_result (fun () -> Prim.run prim env args) in
+      deref_cwd env ~can_deref_cwd;
+      D.capture dbg;
+      D.after_prim dbg prim res token;
+      ok_exn res
+    | Bind (t, f) ->
+      (match exec_sub env dbg t with
+       | exception exn ->
+         deref_cwd env ~can_deref_cwd;
+         reraise exn
+       | x ->
+         (match f x with
+          | exception exn ->
+            let backtrace = Printexc.get_raw_backtrace () in
+            deref_cwd env ~can_deref_cwd;
+            D.user_exn dbg exn backtrace;
+            reraise exn
+          | t -> exec env dbg t ~can_deref_cwd))
+    | Protect { finally; t } ->
+      (match exec_sub env dbg t with
+       | x ->
+         exec env dbg finally ~can_deref_cwd;
+         x
+       | exception exn ->
+         exec env dbg finally ~can_deref_cwd;
+         reraise exn)
+    | Chdir { dir; k } ->
+      D.need_checkpoint dbg;
+      let token = D.before_prim dbg chdir_prim (A1 dir) in
+      let res = to_result (fun () -> Env.chdir env dir) in
+      deref_cwd env ~can_deref_cwd;
+      D.after_prim dbg chdir_prim res token;
+      exec (ok_exn res) dbg k ~can_deref_cwd:true
+    | Fold { fold; f; init; prim; args } ->
+      let token = ref (D.before_prim dbg prim args) in
+      let in_fold_impl = ref true in
+      let res =
+        to_result (fun () ->
+          fold env ~init ~f:(fun acc elt ->
+            in_fold_impl := false;
+            D.capture dbg;
+            D.after_prim dbg prim (Ok (Some elt)) !token;
+            match f acc elt with
             | exception exn ->
-              let backtrace = Printexc.get_raw_backtrace () in
-              deref_cwd env ~can_deref_cwd;
-              D.user_exn dbg exn backtrace;
+              D.user_exn dbg exn (Printexc.get_raw_backtrace ());
               reraise exn
-            | t -> exec env dbg t ~can_deref_cwd))
-      | Protect { finally; t } ->
-        (match exec_sub env dbg t with
-         | x ->
-           exec env dbg finally ~can_deref_cwd;
-           x
-         | exception exn ->
-           exec env dbg finally ~can_deref_cwd;
-           reraise exn)
-      | Chdir { dir; k } ->
-        D.need_checkpoint dbg;
-        let token = D.before_prim dbg chdir_prim (A1 dir) in
-        let res = to_result (fun () -> Env.chdir env dir) in
-        deref_cwd env ~can_deref_cwd;
-        D.after_prim dbg chdir_prim res token;
-        exec (ok_exn res) dbg k ~can_deref_cwd:true
-      | Fold { fold; f; init; prim; args } ->
-        let token = ref (D.before_prim dbg prim args) in
-        let in_fold_impl = ref true in
-        let res =
-          to_result (fun () ->
-            fold env ~init ~f:(fun acc elt ->
-              in_fold_impl := false;
-              D.capture dbg;
-              D.after_prim dbg prim (Ok (Some elt)) !token;
-              match f acc elt with
-              | exception exn ->
-                D.user_exn dbg exn (Printexc.get_raw_backtrace ());
-                reraise exn
-              | t ->
-                let acc = exec env dbg t ~can_deref_cwd:false in
-                token := D.before_prim dbg prim args;
-                in_fold_impl := true;
-                acc))
-        in
-        deref_cwd env ~can_deref_cwd;
-        if !in_fold_impl
+            | t ->
+              let acc = exec env dbg t ~can_deref_cwd:false in
+              token := D.before_prim dbg prim args;
+              in_fold_impl := true;
+              acc))
+      in
+      deref_cwd env ~can_deref_cwd;
+      if !in_fold_impl
+      then (
+        D.capture dbg;
+        match res with
+        | Ok acc ->
+          D.after_prim dbg prim (Ok None) !token;
+          acc
+        | Error (exn, _) as e ->
+          D.after_prim dbg prim e !token;
+          reraise exn)
+      else (
+        match res with
+        | Ok _ -> assert false
+        | Error (exn, _) -> reraise exn)
+    | Fork (a, b) ->
+      D.fork env dbg ~f:(fun env_a dbg_a env_b dbg_b ->
+        if D.force_threads || (might_block a && might_block b)
         then (
-          D.capture dbg;
-          match res with
-          | Ok acc ->
-            D.after_prim dbg prim (Ok None) !token;
-            acc
-          | Error (exn, _) as e ->
-            D.after_prim dbg prim e !token;
-            reraise exn)
-        else (
-          match res with
-          | Ok _ -> assert false
+          if can_deref_cwd then Env.add_cwd_ref env_a;
+          let job = Job.detach ~f:(fun () -> exec env_b dbg_b b ~can_deref_cwd) in
+          let a_res = to_result (fun () -> exec env_a dbg_a a ~can_deref_cwd) in
+          let b_res = Job.wait job in
+          match a_res with
+          | Ok a_res -> a_res, b_res
           | Error (exn, _) -> reraise exn)
-      | Fork (a, b) ->
-        D.fork env dbg ~f:(fun env_a dbg_a env_b dbg_b ->
-          if D.force_threads || (might_block a && might_block b)
-          then (
-            if can_deref_cwd then Env.add_cwd_ref env_a;
-            let job = Job.detach ~f:(fun () -> exec env_b dbg_b b ~can_deref_cwd) in
-            let a_res = to_result (fun () -> exec env_a dbg_a a ~can_deref_cwd) in
-            let b_res = Job.wait job in
-            match a_res with
-            | Ok a_res -> a_res, b_res
-            | Error (exn, _) -> reraise exn)
-          else (
-            let a_res = to_result (fun () -> exec env dbg_a a ~can_deref_cwd:false) in
-            let b_res = exec env dbg_b b ~can_deref_cwd in
-            match a_res with
-            | Ok a_res -> a_res, b_res
-            | Error (exn, _) -> reraise exn))
+        else (
+          let a_res = to_result (fun () -> exec env dbg_a a ~can_deref_cwd:false) in
+          let b_res = exec env dbg_b b ~can_deref_cwd in
+          match a_res with
+          | Ok a_res -> a_res, b_res
+          | Error (exn, _) -> reraise exn))
 
   and exec_sub : type a. Env.t -> D.t -> a t -> a =
     fun env dbg t -> D.sub dbg ~f:(fun dbg -> exec env dbg t ~can_deref_cwd:false)

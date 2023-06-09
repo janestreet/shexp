@@ -38,24 +38,24 @@ module Args = struct
 
   let sexps : type a b. a Spec.t -> (a, b) t -> Sexp.t list =
     fun spec args ->
-      let open Spec in
-      let arg (arg : _ Spec.Arg.t) x acc : Sexp.t list =
-        match arg with
-        | A f -> f x :: acc
-        | L (name, f) -> List [ Atom name; f x ] :: acc
-        | O (name, f, default) ->
-          if x = default then acc else List [ Atom name; f x ] :: acc
-      in
-      match spec, args with
-      | [], A0 () -> []
-      | [ sa ], A1 a -> arg sa a []
-      | [ sa; sb ], A2 (a, b) -> arg sa a @@ arg sb b []
-      | [ sa; sb; sc ], A3 (a, b, c) -> arg sa a @@ arg sb b @@ arg sc c []
-      | [ sa; sb; sc; sd ], A4 (a, b, c, d) ->
-        arg sa a @@ arg sb b @@ arg sc c @@ arg sd d []
-      | [ sa; sb; sc; sd; se ], A5 (a, b, c, d, e) ->
-        arg sa a @@ arg sb b @@ arg sc c @@ arg sd d @@ arg se e []
-      | _ -> invalid_arg "Shexp_process.Prim.Args.sexps"
+    let open Spec in
+    let arg (arg : _ Spec.Arg.t) x acc : Sexp.t list =
+      match arg with
+      | A f -> f x :: acc
+      | L (name, f) -> List [ Atom name; f x ] :: acc
+      | O (name, f, default) ->
+        if x = default then acc else List [ Atom name; f x ] :: acc
+    in
+    match spec, args with
+    | [], A0 () -> []
+    | [ sa ], A1 a -> arg sa a []
+    | [ sa; sb ], A2 (a, b) -> arg sa a @@ arg sb b []
+    | [ sa; sb; sc ], A3 (a, b, c) -> arg sa a @@ arg sb b @@ arg sc c []
+    | [ sa; sb; sc; sd ], A4 (a, b, c, d) ->
+      arg sa a @@ arg sb b @@ arg sc c @@ arg sd d []
+    | [ sa; sb; sc; sd; se ], A5 (a, b, c, d, e) ->
+      arg sa a @@ arg sb b @@ arg sc c @@ arg sd d @@ arg se e []
+    | _ -> invalid_arg "Shexp_process.Prim.Args.sexps"
   ;;
 end
 
