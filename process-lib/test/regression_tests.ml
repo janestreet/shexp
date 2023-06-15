@@ -18,3 +18,7 @@ let%expect_test _ =
   Process.eval ~context p;
   exec_in_sub (fun () -> Process.eval ~context p)
 ;;
+
+let%expect_test _ =
+  Shexp_process.chdir "." (Shexp_process.return ()) |> Shexp_process.eval
+;;

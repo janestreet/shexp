@@ -119,17 +119,12 @@ module Working_dir = struct
   ;;
 
   let chdir t dir =
-    if dir = Filename.current_dir_name
-    then t
-    else (
-      let logical =
-        if Filename.is_relative dir then chdir_logical t.logical dir else dir
-      in
-      let physical =
-        Physical.map_unix t.physical ~f:(fun fd ->
-          Posixat.openat ~dir:fd ~flags:[ O_RDONLY ] ~path:dir ~perm:0)
-      in
-      { logical; physical })
+    let logical = if Filename.is_relative dir then chdir_logical t.logical dir else dir in
+    let physical =
+      Physical.map_unix t.physical ~f:(fun fd ->
+        Posixat.openat ~dir:fd ~flags:[ O_RDONLY ] ~path:dir ~perm:0)
+    in
+    { logical; physical }
   ;;
 
   let addref t = Physical.addref t.physical
