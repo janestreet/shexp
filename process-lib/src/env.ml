@@ -195,12 +195,12 @@ type t =
   }
 
 let create
-      ?(stdin = Unix.stdin)
-      ?(stdout = Unix.stdout)
-      ?(stderr = Unix.stderr)
-      ?(cwd = Working_dir_spec.Inherit)
-      ?unix_env
-      ()
+  ?(stdin = Unix.stdin)
+  ?(stdout = Unix.stdout)
+  ?(stderr = Unix.stderr)
+  ?(cwd = Working_dir_spec.Inherit)
+  ?unix_env
+  ()
   =
   let cwd = Working_dir.create cwd in
   let unix_env = Uenv.create unix_env ~pwd:cwd.logical in

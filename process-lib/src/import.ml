@@ -7,9 +7,9 @@ end
 include (
   StdLabels :
     module type of struct
-    include StdLabels
-  end
-  with module List := StdLabels.List)
+      include StdLabels
+    end
+    with module List := StdLabels.List)
 
 include MoreLabels
 

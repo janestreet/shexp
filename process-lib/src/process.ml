@@ -307,25 +307,25 @@ module With_debug (D : Debugger) = struct
           ~prefix:"shexp-process"
           ~suffix:".output"
           ~f:(fun (fdw, fn) ->
-            protectx
-              (Unix.openfile fn [ O_RDONLY ] 0)
-              ~finally:(fun fd ->
-                try Unix.close fd with
-                | _ -> ())
-              ~f:(fun fdr ->
-                let t =
-                  { dbg; capture = Some { pos = 0; fdr; fdw }; checkpoint = Not_needed }
-                in
-                let env =
-                  Env.set_stdios
-                    env
-                    ~stdin:(if replace_stdin then fdw else Env.stdin env)
-                    ~stdout:(if replace_stdout then fdw else Env.stdout env)
-                    ~stderr:(if replace_stderr then fdw else Env.stderr env)
-                in
-                let res = f env t in
-                capture t;
-                res))
+          protectx
+            (Unix.openfile fn [ O_RDONLY ] 0)
+            ~finally:(fun fd ->
+              try Unix.close fd with
+              | _ -> ())
+            ~f:(fun fdr ->
+              let t =
+                { dbg; capture = Some { pos = 0; fdr; fdw }; checkpoint = Not_needed }
+              in
+              let env =
+                Env.set_stdios
+                  env
+                  ~stdin:(if replace_stdin then fdw else Env.stdin env)
+                  ~stdout:(if replace_stdout then fdw else Env.stdout env)
+                  ~stderr:(if replace_stderr then fdw else Env.stderr env)
+              in
+              let res = f env t in
+              capture t;
+              res))
     ;;
 
     let fork env t ~f =
@@ -346,7 +346,7 @@ module With_debug (D : Debugger) = struct
               dbg_b
               ~parent_capture:t.capture
               ~f:(fun env' t' ->
-                f env { t with dbg = dbg_a; checkpoint = Not_needed } env' t'))
+              f env { t with dbg = dbg_a; checkpoint = Not_needed } env' t'))
     ;;
 
     let toplevel env dbg ~capture ~f =
@@ -622,10 +622,10 @@ let spawn =
       [ A sexp_of_string; A (sexp_of_list sexp_of_string) ]
       (F Background_command.sexp_of_t)
       (fun env prog args ->
-         match Env.spawn env ~prog ~args with
-         | Ok pid -> Background_command.create pid
-         | Error Command_not_found ->
-           Printf.ksprintf failwith "%s: command not found" (quote_for_errors prog))
+        match Env.spawn env ~prog ~args with
+        | Ok pid -> Background_command.create pid
+        | Error Command_not_found ->
+          Printf.ksprintf failwith "%s: command not found" (quote_for_errors prog))
   in
   fun prog args -> pack2 prim prog args
 ;;
@@ -650,10 +650,10 @@ let run_exit_status =
       [ A sexp_of_string; A (sexp_of_list sexp_of_string) ]
       (F Exit_status.sexp_of_t)
       (fun env prog args ->
-         match Env.spawn env ~prog ~args with
-         | Ok pid -> waitpid pid
-         | Error Command_not_found ->
-           Printf.ksprintf failwith "%s: command not found" (quote_for_errors prog))
+        match Env.spawn env ~prog ~args with
+        | Ok pid -> waitpid pid
+        | Error Command_not_found ->
+          Printf.ksprintf failwith "%s: command not found" (quote_for_errors prog))
   in
   fun prog args -> pack2 prim prog args
 ;;
@@ -790,8 +790,8 @@ let echo =
       ]
       Unit
       (fun env where n str ->
-         let str = if not n then str ^ "\n" else str in
-         Bigstring.write_all (Env.get_stdio env where) str)
+        let str = if not n then str ^ "\n" else str in
+        Bigstring.write_all (Env.get_stdio env where) str)
   in
   fun ?(where = Std_io.Stdout) ?n str -> pack3 prim where (n <> None) str
 ;;
@@ -873,7 +873,7 @@ let set_ios =
     ; result = Env
     ; run =
         (fun env ios fd ->
-           List.fold_left ios ~init:env ~f:(fun env where -> Env.set_stdio env where fd))
+          List.fold_left ios ~init:env ~f:(fun env where -> Env.set_stdio env where fd))
     }
   in
   fun ios fd k -> Env_set { k; prim; args = A2 (ios, fd) }
@@ -938,11 +938,11 @@ let replace_io =
     ; result = Env
     ; run =
         (fun env stdin stdout stderr ->
-           Env.set_stdios
-             env
-             ~stdin:(Env.get_stdio env stdin)
-             ~stdout:(Env.get_stdio env stdout)
-             ~stderr:(Env.get_stdio env stderr))
+          Env.set_stdios
+            env
+            ~stdin:(Env.get_stdio env stdin)
+            ~stdout:(Env.get_stdio env stdout)
+            ~stderr:(Env.get_stdio env stderr))
     }
   in
   fun ?(stdin = Std_io.Stdin) ?(stdout = Std_io.Stdout) ?(stderr = Std_io.Stderr) k ->
@@ -1011,7 +1011,7 @@ let mkfifo =
     fun ?(perm = 0o666) path -> pack2 prim perm path)
   else
     fun ?(perm = 0o666) path ->
-      run "/usr/bin/mkfifo" [ "-m"; Printf.sprintf "0o%3o" perm; "--"; path ]
+    run "/usr/bin/mkfifo" [ "-m"; Printf.sprintf "0o%3o" perm; "--"; path ]
 ;;
 
 let link =
@@ -1112,11 +1112,11 @@ module Temp = struct
         [ L ("prefix", sexp_of_string); L ("suffix", sexp_of_string) ]
         (F sexp_of_string)
         (fun env prefix suffix ->
-           let temp_dir = get_temp_dir env in
-           let (), name =
-             Temp0.create ~temp_dir ~prefix ~suffix ~mk:(fun fn -> mk env fn)
-           in
-           name)
+          let temp_dir = get_temp_dir env in
+          let (), name =
+            Temp0.create ~temp_dir ~prefix ~suffix ~mk:(fun fn -> mk env fn)
+          in
+          name)
     in
     fun ~prefix ~suffix -> pack2 prim prefix suffix
   ;;

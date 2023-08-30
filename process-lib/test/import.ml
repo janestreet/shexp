@@ -42,9 +42,9 @@ let cleanup_sexp =
   let rec map : Sexp.t -> Sexp.t = function
     | List l ->
       if (not (List.is_empty l))
-      && List.for_all l ~f:(function
-           | List [ Atom s; _ ] when String.is_prefix s ~prefix:"st_" -> true
-           | _ -> false)
+         && List.for_all l ~f:(function
+              | List [ Atom s; _ ] when String.is_prefix s ~prefix:"st_" -> true
+              | _ -> false)
       then Atom "<stats>"
       else List (List.map l ~f:map)
     | Atom s ->
