@@ -2,14 +2,12 @@ open Core
 open! Expect_test_helpers_core
 open Import
 
-external sys_exit : int -> _ = "caml_sys_exit"
-
 let exec_in_sub f =
   match Unix.fork () with
   | `In_the_child ->
     (try f () with
      | _ -> ());
-    sys_exit 0
+    Unix.exit_immediately 0
   | `In_the_parent pid -> Unix.waitpid pid |> Unix.Exit_or_signal.or_error |> ok_exn
 ;;
 
