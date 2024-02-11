@@ -142,7 +142,8 @@ module Uenv = struct
 
   let split_path str =
     let len = String.length str in
-    let is_sep c = c = ':' in
+    let sep = if Sys.win32 then ';' else ':' in
+    let is_sep c = c = sep in
     let rec loop i j =
       if j = len
       then [ String.sub str ~pos:i ~len:(j - i) ]
@@ -257,12 +258,32 @@ let chdir t dir =
   { t with cwd; unix_env }
 ;;
 
-let find_executable t exe =
+let get_executable_if_exists fn =
+  if Sys.win32 then
+    (* Only some file extensions are executable. `.exe` is always
+       executable. The extensions in PATHEXT (`.exe`, `.bat`, `.cmd`,
+       etc.) are also executable by the Command Prompt shell. We'll
+       just use `.exe` since it is the only correct extension in all
+       contexts. *)
+    let fn_exe = (Filename.remove_extension fn) ^ ".exe" in
+    (* [Sys.file_exists] can return true even if [Sys.is_directory]
+       is true. *)
+    if Sys.file_exists fn_exe && not (Sys.is_directory fn_exe) then
+      Some fn_exe
+    else
+      None
+  else
+    (* Unix *)
+    if Sys.file_exists fn then Some fn else None
+
+let find_executable t exe =  
   let rec loop = function
     | [] -> None
     | path :: rest ->
       let fn = path ^/ exe in
-      if Sys.file_exists fn then Some fn else loop rest
+      match get_executable_if_exists fn with
+      | Some found_fn -> Some found_fn
+      | None -> loop rest
   in
   if not (Filename.is_relative exe)
   then Some exe
