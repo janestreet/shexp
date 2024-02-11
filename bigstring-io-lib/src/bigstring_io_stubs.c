@@ -5,6 +5,10 @@
 #include <caml/bigarray.h>
 #include <caml/signals.h>
 #include <caml/unixsupport.h>
+#ifdef _MSC_VER
+/* Link with the ws2_32 WinSock library so that send() and recv() are linked. */
+#pragma comment( lib, "ws2_32" )
+#endif
 
 #define get_buf(v_buf, v_pos) (char *) Caml_ba_data_val(v_buf) + Long_val(v_pos)
 
