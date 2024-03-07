@@ -297,7 +297,7 @@ val iter_chunks : sep:char -> (string -> unit t) -> unit t
 *)
 val pipe : ?connect:Std_io.t list * Std_io.t -> unit t -> 'a t -> 'a t
 
-(** [pipe_pair a b] is a the same as [pipe] but returns the results of both [a] and
+(** [pipe_both a b] is a the same as [pipe] but returns the results of both [a] and
     [b]. *)
 val pipe_both : ?connect:Std_io.t list * Std_io.t -> 'a t -> 'b t -> ('a * 'b) t
 
