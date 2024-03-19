@@ -21,7 +21,7 @@ let%expect_test _ =
       abcdefghijklmnopqrstuvwxyz
       abcdefghijklmnopqrstuvwxyz
       abcdefghijklmnopqrs
-    |}];
+      |}];
     with_fd ~f:(B.fold_lines ~init:[] ~f:(fun acc line -> line :: acc))
     |> List.rev
     |> [%sexp_of: string list]
@@ -32,5 +32,5 @@ let%expect_test _ =
        abcdefghijklmnopqrstuvwxyz
        abcdefghijklmnopqrstuvwxyz
        abcdefghijklmnopqrs)
-    |}])
+      |}])
 ;;

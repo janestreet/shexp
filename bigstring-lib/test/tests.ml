@@ -15,7 +15,7 @@ let%expect_test _ =
     abcdefghijklmnopqrstuvwxyz
     abcdefghijklmnopqrstuvwxyz
     abcdefghijklmnopqrs
-  |}];
+    |}];
   let line =
     B.fold_temporary ~size:1 ~init:0 ~f:(fun buf pos ->
       let to_copy = min (B.length buf - pos) (String.length input) in
@@ -25,7 +25,5 @@ let%expect_test _ =
       | Some i -> Return (B.sub_string buf ~pos:0 ~len:i))
   in
   print_string line;
-  [%expect {|
-    abcdefghijklmnopqrstuvwxyz
-  |}]
+  [%expect {| abcdefghijklmnopqrstuvwxyz |}]
 ;;

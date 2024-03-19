@@ -12,7 +12,7 @@ let%expect_test "bind" =
   [%expect {|
     Hello, world!
     How are you?
-  |}]
+    |}]
 ;;
 
 let%expect_test "fork" =
@@ -98,7 +98,8 @@ let%expect_test "capture" =
   print_s [%sexp { stdout : string; stderr : string }];
   [%expect {|
     ((stdout "stdout contents")
-     (stderr "stderr contents")) |}]
+     (stderr "stderr contents"))
+    |}]
 ;;
 
 let%expect_test "unix environment" =
@@ -133,13 +134,13 @@ let%expect_test "rename current directory" =
 
     physical current working directory after rename: "<tempdir>/blah-new"
     file foo contains "Hello, world!\n"
-  |}]
+    |}]
 ;;
 
 let%expect_test "rm_rf deletes everything" =
   eval_exn rm_rf;
   [%expect {|
-      tmp dir contents:
-      - .
- |}]
+    tmp dir contents:
+    - .
+    |}]
 ;;

@@ -9,9 +9,7 @@ let show t =
 
 let%expect_test "command not found" =
   show (P.run "command-that-doesnt-exist" []);
-  [%expect {|
-    (raised (Failure "command-that-doesnt-exist: command not found"))
-  |}]
+  [%expect {| (raised (Failure "command-that-doesnt-exist: command not found")) |}]
 ;;
 
 let%expect_test "file not found" =
@@ -20,15 +18,13 @@ let%expect_test "file not found" =
     {|
     (raised (
       Unix.Unix_error "No such file or directory" openat /file-that-doesnt-exist))
-  |}]
+    |}]
 ;;
 
 let%expect_test "multiple errors" =
   show
     (P.unset_env "A" (P.unset_env "B" (P.fork (P.get_env_exn "A") (P.get_env_exn "B"))));
-  [%expect {|
-    (raised (Failure "environment variable \"A\" not found"))
-  |}]
+  [%expect {| (raised (Failure "environment variable \"A\" not found")) |}]
 ;;
 
 let%expect_test "command fails" =
@@ -38,5 +34,6 @@ let%expect_test "command fails" =
   [%expect
     {|
     cat: imaginary-file: No such file or directory
-    (raised (Failure "Command exited with code 1: cat imaginary-file")) |}]
+    (raised (Failure "Command exited with code 1: cat imaginary-file"))
+    |}]
 ;;

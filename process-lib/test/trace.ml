@@ -11,9 +11,7 @@ let trace process =
 
 let%expect_test _ =
   trace (P.echo "Hello, world!");
-  [%expect {|
-    ((echo "Hello, world!") "Hello, world!\n")
-  |}]
+  [%expect {| ((echo "Hello, world!") "Hello, world!\n") |}]
 ;;
 
 let%expect_test _ =
@@ -69,7 +67,7 @@ let%expect_test _ =
      (->    <stats>)
      (rm    <temp-dir>/blah)
      (rmdir <temp-dir>))
-  |}]
+    |}]
 ;;
 
 let%expect_test "multiple errors" =
@@ -87,7 +85,8 @@ let%expect_test "multiple errors" =
         (user-exn (Failure "environment variable \"A\" not found")))
        ((get-env B)
         (-> ())
-        (user-exn (Failure "environment variable \"B\" not found"))))) |}]
+        (user-exn (Failure "environment variable \"B\" not found")))))
+    |}]
 ;;
 
 let%expect_test "rename current directory" =
@@ -244,5 +243,5 @@ let%expect_test "rename current directory" =
      (rm    <temp-dir>/blah-new/foo)
      (rmdir <temp-dir>/blah-new)
      (rmdir <temp-dir>))
-  |}]
+    |}]
 ;;

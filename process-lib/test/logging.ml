@@ -47,5 +47,5 @@ let%expect_test _ =
     ((thread 0) (id 11) -> ())
     ((thread 0) (id 12) (rmdir <temp-dir>))
     ((thread 0) (id 12) -> ())
-  |}]
+    |}]
 ;;
