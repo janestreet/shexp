@@ -13,7 +13,7 @@ external unsafe_blit
   -> len:int
   -> unit
   = "shexp_bigstring_blit_stub"
-  [@@noalloc]
+[@@noalloc]
 
 external unsafe_blit_string_t
   :  src:string
@@ -23,7 +23,7 @@ external unsafe_blit_string_t
   -> len:int
   -> unit
   = "shexp_bigstring_blit_string_bigstring_stub"
-  [@@noalloc]
+[@@noalloc]
 
 external unsafe_blit_t_bytes
   :  src:t
@@ -33,7 +33,7 @@ external unsafe_blit_t_bytes
   -> len:int
   -> unit
   = "shexp_bigstring_blit_bigstring_bytes_stub"
-  [@@noalloc]
+[@@noalloc]
 
 (* See comment in Core.Ordered_set_lang to convince yourself that it is safe *)
 let pos_len_ok ~pos ~len ~length =

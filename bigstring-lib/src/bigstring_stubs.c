@@ -1,5 +1,7 @@
 #define _GNU_SOURCE
 
+#undef Hide_upstream_size_macros
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>

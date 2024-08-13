@@ -9,7 +9,8 @@ let%expect_test "bind" =
   eval_exn
     (let%bind () = P.echo "Hello, world!" in
      P.echo "How are you?");
-  [%expect {|
+  [%expect
+    {|
     Hello, world!
     How are you?
     |}]
@@ -96,7 +97,8 @@ let%expect_test "capture" =
     |> eval_exn
   in
   print_s [%sexp { stdout : string; stderr : string }];
-  [%expect {|
+  [%expect
+    {|
     ((stdout "stdout contents")
      (stderr "stderr contents"))
     |}]
@@ -139,7 +141,8 @@ let%expect_test "rename current directory" =
 
 let%expect_test "rm_rf deletes everything" =
   eval_exn rm_rf;
-  [%expect {|
+  [%expect
+    {|
     tmp dir contents:
     - .
     |}]

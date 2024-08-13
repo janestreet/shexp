@@ -307,25 +307,25 @@ module With_debug (D : Debugger) = struct
           ~prefix:"shexp-process"
           ~suffix:".output"
           ~f:(fun (fdw, fn) ->
-          protectx
-            (Unix.openfile fn [ O_RDONLY ] 0)
-            ~finally:(fun fd ->
-              try Unix.close fd with
-              | _ -> ())
-            ~f:(fun fdr ->
-              let t =
-                { dbg; capture = Some { pos = 0; fdr; fdw }; checkpoint = Not_needed }
-              in
-              let env =
-                Env.set_stdios
-                  env
-                  ~stdin:(if replace_stdin then fdw else Env.stdin env)
-                  ~stdout:(if replace_stdout then fdw else Env.stdout env)
-                  ~stderr:(if replace_stderr then fdw else Env.stderr env)
-              in
-              let res = f env t in
-              capture t;
-              res))
+            protectx
+              (Unix.openfile fn [ O_RDONLY ] 0)
+              ~finally:(fun fd ->
+                try Unix.close fd with
+                | _ -> ())
+              ~f:(fun fdr ->
+                let t =
+                  { dbg; capture = Some { pos = 0; fdr; fdw }; checkpoint = Not_needed }
+                in
+                let env =
+                  Env.set_stdios
+                    env
+                    ~stdin:(if replace_stdin then fdw else Env.stdin env)
+                    ~stdout:(if replace_stdout then fdw else Env.stdout env)
+                    ~stderr:(if replace_stderr then fdw else Env.stderr env)
+                in
+                let res = f env t in
+                capture t;
+                res))
     ;;
 
     let fork env t ~f =
@@ -346,7 +346,7 @@ module With_debug (D : Debugger) = struct
               dbg_b
               ~parent_capture:t.capture
               ~f:(fun env' t' ->
-              f env { t with dbg = dbg_a; checkpoint = Not_needed } env' t'))
+                f env { t with dbg = dbg_a; checkpoint = Not_needed } env' t'))
     ;;
 
     let toplevel env dbg ~capture ~f =

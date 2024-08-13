@@ -31,8 +31,8 @@ let find_files ~(ext : string) : unit t =
      else echo "Bummer, both git and grep were not found in PATH")
     >> command "find"
     >>= (function
-    | true -> run "find" [ "."; "-name"; "*." ^ ext ]
-    | false -> echo "Bummer, find not found in PATH")
+     | true -> run "find" [ "."; "-name"; "*." ^ ext ]
+     | false -> echo "Bummer, find not found in PATH")
 ;;
 
 (* Counts down from n with a one second delay between ticks *)
