@@ -10,12 +10,10 @@ module Dbg (M : sig
     val process : unit Process.t
   end) =
 struct
-  let%bench_module ("" [@name_suffix M.name]) =
-    (module struct
-      let%bench "no dbg" = Process.eval M.process ~context
-      let%bench "traced" = Process.Traced.eval_exn M.process ~context
-    end)
-  ;;
+  module%bench [@name_suffix M.name] _ = struct
+    let%bench "no dbg" = Process.eval M.process ~context
+    let%bench "traced" = Process.Traced.eval_exn M.process ~context
+  end
 end
 
 module _ = Dbg (struct
