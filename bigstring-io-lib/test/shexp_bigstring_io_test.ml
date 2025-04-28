@@ -1,0 +1,1 @@
+module Tests = Tests
