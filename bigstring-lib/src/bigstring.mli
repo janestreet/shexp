@@ -13,8 +13,8 @@ val sub_string : t -> pos:int -> len:int -> string
 val index : t -> pos:int -> len:int -> char:char -> int option
 val rindex : t -> pos:int -> len:int -> char:char -> int option
 
-(** Efficiently checks that the range denoted by [(pos, len)] is in the range
-    [0..length]. [length] is assumed to be [>= 0]. *)
+(** Efficiently checks that the range denoted by [(pos, len)] is in the range [0..length].
+    [length] is assumed to be [>= 0]. *)
 val pos_len_ok : pos:int -> len:int -> length:int -> bool
 
 (** Raises if [(pos, len)] denotes a range outside of [0..length]. *)
@@ -25,8 +25,7 @@ val check_pos_len_exn : pos:int -> len:int -> length:int -> unit
     returns.
 
     This is more efficient than waiting on the garbage collector to release the external
-    memory.
-*)
+    memory. *)
 val with_temporary : size:int -> f:(t -> 'a) -> 'a
 
 type ('a, 'b) fold_temporary_result =
@@ -41,8 +40,7 @@ type ('a, 'b) fold_temporary_result =
 
     If [f] returns [Resize { new_size; state }], the bigstring will be resized to the
     given new size and [f] will be called with the new bigstring and [state]. The contents
-    of the bigstring up to the min of the old and new sizes is preserved.
-*)
+    of the bigstring up to the min of the old and new sizes is preserved. *)
 val fold_temporary
   :  size:int
   -> init:'a

@@ -3,9 +3,8 @@
 open Shexp_sexp.Std
 
 (** An ['a t] value represent a process pipeline description, that can be evaluated using
-    [eval] into a value of type ['a].  Note that creating an ['a t] value has no
-    effect. Effects are only performed when calling [eval].
-*)
+    [eval] into a value of type ['a]. Note that creating an ['a t] value has no effect.
+    Effects are only performed when calling [eval]. *)
 type 'a t
 
 (** Execution contexts *)
@@ -16,8 +15,7 @@ module Context : sig
       This consists of:
       - stdin, stdout, stderr
       - the current working directory
-      - the unix environment variables
-  *)
+      - the unix environment variables *)
   type t
 
   module Working_dir : sig
@@ -50,8 +48,7 @@ end
 (** Evaluate the given process in the given environment.
 
     If [context] is not specified, a temporary one is created. If you are calling [eval]
-    many times, then creating a context and reusing it is more efficient.
-*)
+    many times, then creating a context and reusing it is more efficient. *)
 val eval : ?context:Context.t -> 'a t -> 'a
 
 module Logged : sig
@@ -59,7 +56,7 @@ module Logged : sig
       stderr.
 
       If [capture] is [true], then anything printed on the original [stdout]/[stderr] is
-      captured and becomes part of the trace.  *)
+      captured and becomes part of the trace. *)
   val eval
     :  ?context:Context.t
     -> ?capture:bool (** default: false *)
@@ -72,7 +69,7 @@ module Traced : sig
   (** Produce a full execution trace.
 
       If [capture] is [true], then anything printed on the original [stdout]/[stderr] is
-      captured and becomes part of the trace.  *)
+      captured and becomes part of the trace. *)
   val eval
     :  ?context:Context.t
     -> ?capture:bool (** default: false *)
@@ -138,8 +135,7 @@ val fail : exn -> _ t
 
     Regarding errors, if the evaluation of both processes fail, then only one the
     exceptions will be kept. It is not specified which one. You should use [Traced] to get
-    a full trace and see what exceptions are raised and where.
-*)
+    a full trace and see what exceptions are raised and where. *)
 val fork : 'a t -> 'b t -> ('a * 'b) t
 
 (** Same as [map (fork a b) ~f:(fun (x, ()) -> x)] *)
@@ -162,17 +158,14 @@ val protect : finally:unit t -> 'a t -> 'a t
     For instance in the following code [finally] wouldn't be executed:
 
     {[
-      let f () = raise Not_found
-
-                   protect ~finally (f ())
+      let f () = raise Not_found protect ~finally (f ())
     ]}
 
     You can write instead:
 
     {[
       protect ~finally (reify_exn f ())
-    ]}
-*)
+    ]} *)
 val reify_exn : ('a -> 'b t) -> 'a -> 'b t
 
 (** {1 Running commands} *)
@@ -193,19 +186,19 @@ val run_exit_status : string -> string list -> Exit_status.t t
 (** Run an external program, returns [true] if its exit code is part of [true_v] and
     [false] if it is part of [false_v]. *)
 val run_bool
-  :  ?true_v:int list (** default: [\[0\]] *)
-  -> ?false_v:int list (** default: [\[1\]] *)
+  :  ?true_v:int list (** default: [[0]] *)
+  -> ?false_v:int list (** default: [[1]] *)
   -> string
   -> string list
   -> bool t
 
-(** Same functions as the 'run' ones above, but take a string list instead. This
-    way, the first element and the others are treated in a homogeneous way. It
-    can ease prepending commands in specific circumstances, e.g.
+(** Same functions as the 'run' ones above, but take a string list instead. This way, the
+    first element and the others are treated in a homogeneous way. It can ease prepending
+    commands in specific circumstances, e.g.
     [if profile then call ("time" :: command) else call command]
 
-    E.g. [call ["grep"; "-i"; pattern; filename]] is equivalent to [run "grep"
-    ["-i"; pattern; filename]] *)
+    E.g. [call ["grep"; "-i"; pattern; filename]] is equivalent to
+    [run "grep" ["-i"; pattern; filename]] *)
 val call : string list -> unit t
 
 val call_exit_code : string list -> int t
@@ -248,8 +241,8 @@ val unset_env : string -> 'a t -> 'a t
 (** {1 Current working directory} *)
 
 (** Return the current working directory. Note that there is no guarantee that this
-    directory exists. For instance if a component in this path has is renamed during
-    the evaluation of the process, then this will be a dangling directory. *)
+    directory exists. For instance if a component in this path has is renamed during the
+    evaluation of the process, then this will be a dangling directory. *)
 val cwd_logical : string t
 
 (** [chdir dir k] represents the process [k] evaluated in a context where the current
@@ -280,8 +273,8 @@ val read_all : string t
     ["\r\n"] and ["\n"] are treated as end of lines. *)
 val fold_lines : init:'a -> f:('a -> string -> 'a t) -> 'a t
 
-(** Fold over chunks separated by [sep] in the input. This can be used in conjunction
-    with commands that support ending entries in the output with a ['\000'] such as
+(** Fold over chunks separated by [sep] in the input. This can be used in conjunction with
+    commands that support ending entries in the output with a ['\000'] such as
     [find -print0]. *)
 val fold_chunks : sep:char -> init:'a -> f:('a -> string -> 'a t) -> 'a t
 
@@ -293,12 +286,10 @@ val iter_chunks : sep:char -> (string -> unit t) -> unit t
 (** [pipe ~connect:(aios, bio) a b] is a process obtain by connecting the [aios] of [a] to
     the [bio] of [b]. [a] and [b] are evaluated in parallel (as with [fork]).
 
-    [(aio, bio)] defaults to [([Stdout], Stdin)].
-*)
+    [(aio, bio)] defaults to [([Stdout], Stdin)]. *)
 val pipe : ?connect:Std_io.t list * Std_io.t -> unit t -> 'a t -> 'a t
 
-(** [pipe_both a b] is a the same as [pipe] but returns the results of both [a] and
-    [b]. *)
+(** [pipe_both a b] is a the same as [pipe] but returns the results of both [a] and [b]. *)
 val pipe_both : ?connect:Std_io.t list * Std_io.t -> 'a t -> 'b t -> ('a * 'b) t
 
 (** Same as [pipe ~connect:([Stderr], Stdin)]. *)
@@ -314,8 +305,8 @@ val capture_unit : Std_io.t list -> unit t -> string t
 
 (** {1 Redirections} *)
 
-(** [redirect ios ?perm ~flags filename t] redirects the following ios to a file in
-    [t]. [perm] and [flags] are passed the same as for [Unix.openfile]. *)
+(** [redirect ios ?perm ~flags filename t] redirects the following ios to a file in [t].
+    [perm] and [flags] are passed the same as for [Unix.openfile]. *)
 val redirect
   :  Std_io.t list
   -> ?perm:int
@@ -353,8 +344,7 @@ val set_temp_dir : string -> 'a t -> 'a t
 (** [with_temp_file ~prefix ~suffix f] is a process that creates a temporary file and
     passes it to [f]. The file is created inside the temporary directory.
 
-    When the process returned by [f] finishes, the file is removed.
-*)
+    When the process returned by [f] finishes, the file is removed. *)
 val with_temp_file : prefix:string -> suffix:string -> (string -> 'a t) -> 'a t
 
 (** Same as [with_temp_file] but creates a directory. The directory and its contents are

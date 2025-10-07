@@ -10,8 +10,7 @@ module Logger : sig
 end
 
 (** Produce a full execution trace. The order of the trace is independent of the order in
-    which commands are executed in different threads, so it is suitable for expect tests.
-*)
+    which commands are executed in different threads, so it is suitable for expect tests. *)
 module Tracer : sig
   include S
 
