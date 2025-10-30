@@ -1,5 +1,5 @@
 (library
  (name shexp_bigstring_test)
- (libraries shexp_bigstring core expect_test_helpers_core)
+ (libraries core expect_test_helpers_core shexp_bigstring)
  (preprocess
   (pps ppx_jane)))

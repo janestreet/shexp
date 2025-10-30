@@ -84,11 +84,11 @@ let detach ~f =
   t
 ;;
 
-let really_wait t cond =
+let rec really_wait t cond =
   Condition.wait cond t.mutex;
   match t.state with
   | Finished res -> res
-  | _ -> assert false
+  | _ -> (really_wait [@ocaml.tailcall]) t cond
 ;;
 
 let wait t =

@@ -1,6 +1,6 @@
 (library
  (name shexp_process)
  (public_name shexp.process)
- (libraries unix threads spawn shexp_sexp shexp_bigstring shexp_bigstring_io
-   posixat)
+ (libraries posixat shexp_bigstring shexp_bigstring_io shexp_sexp spawn
+   threads unix)
  (preprocess no_preprocessing))
