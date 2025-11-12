@@ -1,6 +1,6 @@
 (library
  (name shexp_bigstring_io_test)
- (libraries shexp_bigstring_io core core_unix expect_test_helpers_core
-   core_unix.filename_unix core_unix.sys_unix unix)
+ (libraries core core_unix expect_test_helpers_core core_unix.filename_unix
+   shexp_bigstring_io core_unix.sys_unix unix)
  (preprocess
   (pps ppx_jane)))

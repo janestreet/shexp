@@ -1,6 +1,6 @@
 (library
  (name shexp_process_test)
- (libraries shexp_process core core_unix expect_test_helpers_core
+ (libraries core core_unix expect_test_helpers_core shexp_process
    core_unix.sys_unix threads)
  (preprocess
   (pps ppx_jane)))
