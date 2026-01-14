@@ -23,4 +23,4 @@ val record : (string * t) list -> t
 val cstr : string -> t list -> t
 val cstr_record : string -> (string * t) list -> t
 val cstr_list : string -> ('a -> t) -> 'a list -> t
-val register_exn_converter : extension_constructor -> (exn -> t) -> unit
+val register_exn_converter : extension_constructor -> (exn -> t) @ portable -> unit
