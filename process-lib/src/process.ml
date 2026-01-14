@@ -99,8 +99,7 @@ type 'a t =
       { finally : unit t
       ; t : 'a t
       }
-  (* Note: it is expected that the function in the following two constructors never
-     raise *)
+  (* Note: it is expected that the function in the following two constructors never raise *)
   | Env_get :
       { prim : ('a, 'b) Prim.t
       ; args : ('a, 'b) Prim.Args.t
