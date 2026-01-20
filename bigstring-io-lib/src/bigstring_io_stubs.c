@@ -5,6 +5,10 @@
 #include <caml/bigarray.h>
 #include <caml/signals.h>
 #include <caml/unixsupport.h>
+#ifdef _MSC_VER
+/* Link with the ws2_32 WinSock library so that send() and recv() are linked. */
+#pragma comment( lib, "ws2_32" )
+#endif
 
 #define get_buf(v_buf, v_pos) (char *) Caml_ba_data_val(v_buf) + Long_val(v_pos)
 
@@ -41,20 +45,20 @@ CAMLprim value shexp_bigstring_io_read(value fd, value buf, value ofs, value len
   CAMLparam1(buf);
   DWORD numread;
   DWORD err = 0;
-  char* buf = get_buf(buf, ofs);
+  char* ptr = get_buf(buf, ofs);
 
   if (Descr_kind_val(fd) == KIND_SOCKET) {
     int ret;
     SOCKET s = Socket_val(fd);
     caml_enter_blocking_section();
-    ret = recv(s, buf, Long_val(len), 0);
+    ret = recv(s, ptr, Long_val(len), 0);
     if (ret == SOCKET_ERROR) err = WSAGetLastError();
     caml_leave_blocking_section();
     numread = ret;
   } else {
     HANDLE h = Handle_val(fd);
     caml_enter_blocking_section();
-    if (! ReadFile(h, buf, Long_val(len), &numread, NULL))
+    if (! ReadFile(h, ptr, Long_val(len), &numread, NULL))
       err = GetLastError();
     caml_leave_blocking_section();
   }
@@ -71,20 +75,20 @@ CAMLprim value shexp_bigstring_io_write(value fd, value buf, value ofs, value le
   CAMLparam1(buf);
   DWORD numwritten;
   DWORD err = 0;
-  char* buf = get_buf(buf, ofs);
+  char* ptr = get_buf(buf, ofs);
 
   if (Descr_kind_val(fd) == KIND_SOCKET) {
     int ret;
     SOCKET s = Socket_val(fd);
     caml_enter_blocking_section();
-    ret = send(s, buf, Long_val(len), 0);
+    ret = send(s, ptr, Long_val(len), 0);
     if (ret == SOCKET_ERROR) err = WSAGetLastError();
     caml_leave_blocking_section();
     numwritten = ret;
   } else {
     HANDLE h = Handle_val(fd);
     caml_enter_blocking_section();
-    if (! WriteFile(h, src, Long_val(len), &numwritten, NULL))
+    if (! WriteFile(h, ptr, Long_val(len), &numwritten, NULL))
       err = GetLastError();
     caml_leave_blocking_section();
   }
