@@ -65,7 +65,8 @@ let list_jbuilds =
        "/dev/null"
        (P.run "find" [ "-print0" ]
         |- P.fold_chunks ~sep:'\000' ~init:[] ~f:(fun l x -> P.return (x :: l))
-        >>| List.filter ~f:(fun p -> [%equal: string] (Filename.basename p) "jbuild")
+        >>| List.filter ~f:(fun p ->
+          ([%equal: string] [@mode local]) (Filename.basename p) "jbuild")
         >>= P.List.iter ~f:P.echo))
 ;;
 
