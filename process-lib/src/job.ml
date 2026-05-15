@@ -36,12 +36,14 @@ module Worker = struct
 
   let workers = Queue.create ()
   let count = ref 0
-  let mutex = Mutex.create ()
+  let mutex = ref (Mutex.create ())
 
   let rec loop t =
-    Mutex.lock mutex;
+    (* It is safe to dereference [mutex] here because [mutex] is only ever mutated before
+       [loop] runs in a given process. *)
+    Mutex.lock !mutex;
     Queue.push t workers;
-    Mutex.unlock mutex;
+    Mutex.unlock !mutex;
     (* Wait for a job *)
     let (T job) = Event.sync (Event.receive t.next_job) in
     run job;
@@ -58,18 +60,20 @@ let pid = ref 0
 
 let detach ~f =
   let t = { work = f; state = Pending; mutex = Mutex.create () } in
-  Mutex.lock Worker.mutex;
-  (* Detect forks *)
+  (* Detect forks before locking [Worker.mutex]. If we've forked and some other thread was
+     holding it, it may be deadlocked forever. *)
   let current_pid = Unix.getpid () in
   if !pid <> current_pid
   then (
     pid := current_pid;
     Queue.clear Worker.workers;
-    Worker.count := 0);
+    Worker.count := 0;
+    Worker.mutex := Mutex.create ());
+  Mutex.lock !Worker.mutex;
   if not (Queue.is_empty Worker.workers)
   then (
     let worker = Queue.pop Worker.workers in
-    Mutex.unlock Worker.mutex;
+    Mutex.unlock !Worker.mutex;
     Event.sync (Event.send worker.next_job (T t)))
   else (
     let f =
@@ -79,7 +83,7 @@ let detach ~f =
         incr Worker.count;
         Worker.start)
     in
-    Mutex.unlock Worker.mutex;
+    Mutex.unlock !Worker.mutex;
     ignore (Thread.create f t : Thread.t));
   t
 ;;

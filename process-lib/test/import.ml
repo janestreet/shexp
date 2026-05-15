@@ -39,14 +39,19 @@ let tmpdir_suffix = "-END-OF-TMPDIR"
 
 let cleanup_sexp =
   let pat = String.Search_pattern.create tmpdir_suffix in
-  let rec map : Sexp.t -> Sexp.t = function
-    | List l ->
-      if (not (List.is_empty l))
-         && List.for_all l ~f:(function
-           | List [ Atom s; _ ] when String.is_prefix s ~prefix:"st_" -> true
-           | _ -> false)
-      then Atom "<stats>"
-      else List (List.map l ~f:map)
+  let rec map : fds:(Sexp.t, Sexp.t) Hashtbl.t -> Sexp.t -> Sexp.t =
+    fun ~fds -> function
+    | List [ Atom "fd"; unstable_sexp ] ->
+      let stable_sexp =
+        Hashtbl.find_or_add fds unstable_sexp ~default:(fun () ->
+          Atom (sprintf "<%i>" (Hashtbl.length fds)))
+      in
+      List [ Atom "fd"; stable_sexp ]
+    | List (_ :: _ as l)
+      when List.for_all l ~f:(function
+             | List [ Atom s; _ ] when String.is_prefix s ~prefix:"st_" -> true
+             | _ -> false) -> Atom "<stats>"
+    | List l -> List (List.map l ~f:(map ~fds))
     | Atom s ->
       Atom
         (match String.Search_pattern.index pat ~in_:s with
@@ -55,7 +60,7 @@ let cleanup_sexp =
            let i = i + String.length tmpdir_suffix in
            "<temp-dir>" ^ String.sub s ~pos:i ~len:(String.length s - i))
   in
-  map
+  fun sexp -> map sexp ~fds:(Hashtbl.create (module Sexp))
 ;;
 
 let find dir =

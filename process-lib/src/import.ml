@@ -118,7 +118,13 @@ end
 
 module Posixat = struct
   open Posixat
-  module Fd = Fd
+
+  module Fd = struct
+    include Fd
+
+    let sexp_of_t t = Sexp.List [ Atom "fd"; sexp_of_t t ]
+  end
+
   module Open_flag = Open_flag
   module At_flag = At_flag
   module Access_permission = Access_permission
